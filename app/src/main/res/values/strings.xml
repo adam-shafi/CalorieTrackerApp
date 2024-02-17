@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">CalorieTracker</string>
+    <string name="daily_log">Daily Log</string>
+    <string name="edit">Edit</string>
+    <string name="statistics">Statistics</string>
+    <string name="budget">Budget</string>
+    <string name="minus">-</string>
+    <string name="food">Food</string>
+    <string name="equals">=</string>
+    <string name="remaining">Remaining</string>
+    <string name="over">Over</string>
+</resources>
