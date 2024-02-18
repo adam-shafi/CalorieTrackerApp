@@ -93,7 +93,7 @@ fun LinearProgressBar(
     )
 
     // Trigger the LaunchedEffect to start the animation when the composable is first launched.
-    LaunchedEffect(Unit) {
+    LaunchedEffect(key1 = indicatorNumber) {
         percentage = if(indicatorNumber > 100) 100F else indicatorNumber.toFloat()
     }
 

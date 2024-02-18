@@ -1,4 +1,4 @@
-package com.example.calorietracker.ui.daily_log
+package com.example.calorietracker.ui.daily_log.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,10 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
 import com.example.calorietracker.ui.components.VerticalText
+import com.example.calorietracker.ui.daily_log.Meal
 import com.example.calorietracker.ui.theme.CarbRed
 import com.example.calorietracker.ui.theme.FatGreen
 import com.example.calorietracker.ui.theme.ProteinBlue
@@ -33,7 +35,7 @@ import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
 
 @Composable
-fun MealCard() {
+fun MealCard(meal: Meal) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,35 +51,26 @@ fun MealCard() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "Breakfast", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "410 cal")
+                Text(text = meal.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = "${meal.calories} cal")
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                VerticalText(title = "50 g", description = "Protein", color = ProteinBlue)
-                VerticalText(title = "25 g", description = "Carbs", color = CarbRed)
-                VerticalText(title = "16 g", description = "Fat", color = FatGreen)
+                VerticalText(title = "${meal.protein} g", description = stringResource(id = R.string.protein), color = ProteinBlue)
+                VerticalText(title = "${meal.carbs} g", description = stringResource(id = R.string.carbs), color = CarbRed)
+                VerticalText(title = "${meal.fat} g", description = stringResource(id = R.string.fat), color = FatGreen)
             }
-            MealItem(
-                food = "Ramen",
-                serving = "152 grams",
-                calories = "160 cal",
-                painter = painterResource(id = R.drawable.chinese_food)
-            )
-            MealItem(
-                food = "Rice",
-                serving = "72 grams",
-                calories = "120 cal",
-                painter = painterResource(id = R.drawable.hot_food)
-            )
-            MealItem(
-                food = "Canned Tuna",
-                serving = "1 can",
-                calories = "130 cal",
-                painter = painterResource(id = R.drawable.canned_fish_food)
-            )
+            meal.foods.forEach{ food ->
+                MealItem(
+                    food = food.name,
+                    serving = "${food.servingAmount} ${food.servingUnits}",
+                    calories = "${food.calories} cal",
+                    painter = painterResource(id = food.iconId)
+                )
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End

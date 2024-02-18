@@ -1,4 +1,4 @@
-package com.example.calorietracker.ui.daily_log
+package com.example.calorietracker.ui.daily_log.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -24,11 +24,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
+import com.example.calorietracker.R
+import com.example.calorietracker.ui.daily_log.DailyLogUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerBar() {
+fun DatePickerBar(
+    date: String
+) {
 
     var isModalOpen by remember { mutableStateOf(false) }
 
@@ -51,7 +56,7 @@ fun DatePickerBar() {
                 isModalOpen = true
             }) {
                 Icon(imageVector = Icons.Filled.DateRange, contentDescription = "Date")
-                Text(text = "Today", fontSize = 16.sp)
+                Text(text = date, fontSize = 16.sp)
             }
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(
@@ -79,7 +84,7 @@ fun DatePickerBar() {
                     },
                     enabled = confirmEnabled
                 ) {
-                    Text("OK")
+                    Text(stringResource(id = R.string.ok))
                 }
             },
             dismissButton = {
@@ -88,7 +93,7 @@ fun DatePickerBar() {
                         isModalOpen = false
                     }
                 ) {
-                    Text("Cancel")
+                    Text(stringResource(id = R.string.cancel))
                 }
             }
         )

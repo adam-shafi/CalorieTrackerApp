@@ -3,6 +3,7 @@ package com.example.calorietracker.ui.daily_log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
@@ -17,17 +18,45 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.calorietracker.R
+import com.example.calorietracker.ui.daily_log.components.DatePickerBar
+import com.example.calorietracker.ui.daily_log.components.MacroSnapshot
+import com.example.calorietracker.ui.daily_log.components.MealCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyLogScreen(
     viewModel: DailyLogViewModel
 ) {
-
+    val uiState by viewModel.uiState.collectAsState()
+    val totalCalorieInfoState =
+        remember(key1 = uiState.totalCalories.budget, key2 = uiState.totalCalories.foodEaten) {
+            viewModel.calculateCalorieState(
+                uiState.totalCalories.budget,
+                uiState.totalCalories.foodEaten
+            )
+        }
+    val totalProteinInfoState =
+        remember(key1 = uiState.totalProtein.budget, key2 = uiState.totalProtein.foodEaten) {
+            viewModel.calculateMacroState(
+                uiState.totalProtein.budget,
+                uiState.totalProtein.foodEaten
+            )
+        }
+    val totalCarbInfoState =
+        remember(key1 = uiState.totalCarbs.budget, key2 = uiState.totalCarbs.foodEaten) {
+            viewModel.calculateMacroState(uiState.totalCarbs.budget, uiState.totalCarbs.foodEaten)
+        }
+    val totalFatInfoState =
+        remember(key1 = uiState.totalFat.budget, key2 = uiState.totalFat.foodEaten) {
+            viewModel.calculateMacroState(uiState.totalFat.budget, uiState.totalFat.foodEaten)
+        }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -64,24 +93,25 @@ fun DailyLogScreen(
     ) { paddingValues ->
         Surface(modifier = Modifier.padding(paddingValues)) {
             Column {
-                DatePickerBar()
+                DatePickerBar(date = uiState.date)
                 Divider()
                 MacroSnapshot(
-                    budget = 2000,
-                    food = 1500,
-                    result = 500,
-                    dataUsage = 75f
+                    uiState = uiState,
+                    calorieInfoState = totalCalorieInfoState,
+                    proteinInfoState = totalProteinInfoState,
+                    carbInfoState = totalCarbInfoState,
+                    fatInfoState = totalFatInfoState
                 )
                 Divider()
                 LazyColumn {
-                    item {
-                        MealCard()
-                    }
-                    item {
-                        MealCard()
+                    items(uiState.meals) { meal ->
+                        MealCard(meal)
                     }
                 }
             }
         }
     }
 }
+
+
+

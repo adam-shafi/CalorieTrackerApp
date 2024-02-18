@@ -1,4 +1,4 @@
-package com.example.calorietracker.ui.daily_log
+package com.example.calorietracker.ui.daily_log.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,6 +25,9 @@ import com.example.calorietracker.ui.components.CircularProgressbar
 import com.example.calorietracker.ui.components.LinearProgressBar
 import com.example.calorietracker.ui.components.TitleText
 import com.example.calorietracker.ui.components.VerticalText
+import com.example.calorietracker.ui.daily_log.DailyLogUiState
+import com.example.calorietracker.ui.daily_log.DerivedMacroInfoState
+import com.example.calorietracker.ui.daily_log.Nutrition
 import com.example.calorietracker.ui.theme.CactusGreen
 import com.example.calorietracker.ui.theme.CarbRed
 import com.example.calorietracker.ui.theme.CarbRedGradient
@@ -36,15 +40,52 @@ import com.example.calorietracker.ui.theme.ProteinBlueGradient
 import com.example.calorietracker.ui.theme.dimen_10dp
 import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
-
+import kotlin.math.roundToInt
 
 @Composable
 fun MacroSnapshot(
-    budget: Int,
-    food: Int,
-    result: Int,
-    dataUsage: Float
+    uiState: DailyLogUiState,
+    calorieInfoState: DerivedMacroInfoState,
+    proteinInfoState: DerivedMacroInfoState,
+    carbInfoState: DerivedMacroInfoState,
+    fatInfoState: DerivedMacroInfoState
 ) {
+    MacroSnapshot(
+        calorieBudget = uiState.totalCalories.budget.roundToInt(),
+        calorieEaten = uiState.totalCalories.foodEaten.roundToInt(),
+        calorieRemainder = calorieInfoState.remainder,
+        caloriePercent = calorieInfoState.percent,
+        isCalorieOver = calorieInfoState.isOver,
+        proteinEaten = uiState.totalProtein.foodEaten.roundToInt(),
+        proteinBudget = uiState.totalProtein.budget.roundToInt(),
+        proteinPercent = proteinInfoState.percent.roundToInt(),
+        carbsEaten = uiState.totalCarbs.foodEaten.roundToInt(),
+        carbsBudget = uiState.totalCarbs.budget.roundToInt(),
+        carbPercent = carbInfoState.percent.roundToInt(),
+        fatEaten = uiState.totalFat.foodEaten.roundToInt(),
+        fatBudget = uiState.totalFat.budget.roundToInt(),
+        fatPercent = fatInfoState.percent.roundToInt()
+    )
+}
+
+@Composable
+fun MacroSnapshot(
+    calorieBudget: Int,
+    calorieEaten: Int,
+    calorieRemainder: Float,
+    caloriePercent: Float,
+    isCalorieOver: Boolean,
+    proteinEaten: Int,
+    proteinBudget: Int,
+    proteinPercent: Int,
+    carbsEaten: Int,
+    carbsBudget: Int,
+    carbPercent: Int,
+    fatEaten: Int,
+    fatBudget: Int,
+    fatPercent: Int
+) {
+
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
@@ -55,11 +96,28 @@ fun MacroSnapshot(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             TitleText(text = "Calories")
-            CalorieInfo(budget = budget, result = result, food = food, dataUsage = dataUsage)
+            CalorieInfo(
+                budget = calorieBudget,
+                remainder = calorieRemainder,
+                foodEaten = calorieEaten,
+                percent = caloriePercent,
+                isOver = isCalorieOver
+            )
             Spacer(modifier = Modifier.height(4.dp))
             TitleText(text = "Macros")
-            MacroInfo()
+            MacroInfo(
+                proteinBudget = proteinBudget,
+                proteinEaten = proteinEaten,
+                proteinPercent = proteinPercent,
+                carbsBudget = carbsBudget,
+                carbsEaten = carbsEaten,
+                carbPercent = carbPercent,
+                fatBudget = fatBudget,
+                fatEaten = fatEaten,
+                fatPercent = fatPercent
+            )
         }
+
 
     }
 }
@@ -67,9 +125,10 @@ fun MacroSnapshot(
 @Composable
 fun CalorieInfo(
     budget: Int,
-    result: Int,
-    food: Int,
-    dataUsage: Float,
+    foodEaten: Int,
+    remainder: Float,
+    percent: Float,
+    isOver: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -79,50 +138,63 @@ fun CalorieInfo(
     ) {
         VerticalText(title = budget.toString(), description = stringResource(id = R.string.budget))
         CircularProgressbar(
-            name = result.toFloat(),
+            name = remainder,
             size = 140.dp,
             backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
-            description = if (dataUsage > 100f) stringResource(id = R.string.over) else stringResource(
+            description = if (isOver) stringResource(id = R.string.over) else stringResource(
                 id = R.string.remaining
             ),
-            dataUsage = dataUsage,
+            dataUsage = percent,
             titleTextStyle = TextStyle(
                 fontSize = 24.sp,
-                color = if (dataUsage > 100f) ChillRed else CactusGreen
+                color = if (isOver) ChillRed else CactusGreen
             ),
             descriptionTextStyle = TextStyle(
                 fontSize = 20.sp,
                 color = DescriptionGray
             )
         )
-        VerticalText(title = food.toString(), description = stringResource(id = R.string.food))
+        VerticalText(title = foodEaten.toString(), description = stringResource(id = R.string.food))
     }
 }
 
 @Composable
-fun MacroInfo() {
+fun MacroInfo(
+    proteinEaten: Int,
+    proteinBudget: Int,
+    proteinPercent: Int,
+    carbsEaten: Int,
+    carbsBudget: Int,
+    carbPercent: Int,
+    fatEaten: Int,
+    fatBudget: Int,
+    fatPercent: Int
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         MacroElement(
-            title = "Protein",
-            current = 125,
-            total = 175,
+            title = stringResource(id = R.string.protein),
+            current = proteinEaten,
+            percent = proteinPercent,
+            total = proteinBudget,
             color = ProteinBlue,
             gradientColor = ProteinBlueGradient
         )
         MacroElement(
-            title = "Carbs",
-            current = 112,
-            total = 70,
+            title = stringResource(id = R.string.carbs),
+            current = carbsEaten,
+            percent = carbPercent,
+            total = carbsBudget,
             color = CarbRed,
             gradientColor = CarbRedGradient
         )
         MacroElement(
-            title = "Fat",
-            current = 60,
-            total = 65,
+            title = stringResource(id = R.string.fat),
+            current = fatEaten,
+            percent = fatPercent,
+            total = fatBudget,
             color = FatGreen,
             gradientColor = FatGreenGradient
         )
@@ -132,12 +204,12 @@ fun MacroInfo() {
 }
 
 
-
 @Composable
 fun RowScope.MacroElement(
     title: String,
     current: Int,
     total: Int,
+    percent: Int,
     color: Color,
     gradientColor: Color
 ) {
@@ -156,7 +228,7 @@ fun RowScope.MacroElement(
         LinearProgressBar(
             modifier = Modifier.padding(horizontal = dimen_8dp),
             gradientColors = listOf(color, gradientColor),
-            indicatorNumber = ((current.toFloat() / total) * 100).toInt()
+            indicatorNumber = percent
         )
         Text(text = "$current / $total g", fontSize = 14.sp)
     }

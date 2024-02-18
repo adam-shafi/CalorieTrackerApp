@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -88,12 +89,11 @@ fun CircularProgressbar(
         ), label = ""
     )
 
-    // Trigger the LaunchedEffect to start the animation when the composable is first launched.
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(key1 = name, key2 = dataUsage) {
         dataUsageRemember = dataUsage
         titleUsageRemember = name
     }
-
     // Box to hold the entire composable
     Box(
         modifier = Modifier
@@ -167,7 +167,7 @@ private fun DisplayText(
     titleTextStyle: TextStyle,
     descriptionTextStyle: TextStyle,
 
-) {
+    ) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
