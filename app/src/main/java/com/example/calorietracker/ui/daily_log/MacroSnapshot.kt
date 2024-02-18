@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
@@ -21,9 +22,17 @@ import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
 import com.example.calorietracker.ui.components.CircularProgressbar
 import com.example.calorietracker.ui.components.LinearProgressBar
+import com.example.calorietracker.ui.components.TitleText
+import com.example.calorietracker.ui.components.VerticalText
 import com.example.calorietracker.ui.theme.CactusGreen
+import com.example.calorietracker.ui.theme.CarbRed
+import com.example.calorietracker.ui.theme.CarbRedGradient
 import com.example.calorietracker.ui.theme.ChillRed
 import com.example.calorietracker.ui.theme.DescriptionGray
+import com.example.calorietracker.ui.theme.FatGreen
+import com.example.calorietracker.ui.theme.FatGreenGradient
+import com.example.calorietracker.ui.theme.ProteinBlue
+import com.example.calorietracker.ui.theme.ProteinBlueGradient
 import com.example.calorietracker.ui.theme.dimen_10dp
 import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
@@ -99,52 +108,38 @@ fun MacroInfo() {
         MacroElement(
             title = "Protein",
             current = 125,
-            total = 175
+            total = 175,
+            color = ProteinBlue,
+            gradientColor = ProteinBlueGradient
         )
         MacroElement(
             title = "Carbs",
             current = 112,
-            total = 70
+            total = 70,
+            color = CarbRed,
+            gradientColor = CarbRedGradient
         )
         MacroElement(
             title = "Fat",
-            current = 20,
-            total = 65
+            current = 60,
+            total = 65,
+            color = FatGreen,
+            gradientColor = FatGreenGradient
         )
     }
 
 
 }
 
-@Composable
-fun VerticalText(
-    title: String,
-    description: String,
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        TitleText(text = title)
-        Text(
-            text = description,
-            color = DescriptionGray
-        )
-    }
-}
 
-@Composable
-fun TitleText(text: String) {
-    Text(
-        text = text,
-        fontSize = 24.sp,
-    )
-}
 
 @Composable
 fun RowScope.MacroElement(
     title: String,
     current: Int,
     total: Int,
+    color: Color,
+    gradientColor: Color
 ) {
     val modifier = Modifier
         .weight(1f)
@@ -155,10 +150,12 @@ fun RowScope.MacroElement(
         Text(
             modifier = Modifier.padding(bottom = dimen_16dp),
             text = title,
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            color = color
         )
         LinearProgressBar(
             modifier = Modifier.padding(horizontal = dimen_8dp),
+            gradientColors = listOf(color, gradientColor),
             indicatorNumber = ((current.toFloat() / total) * 100).toInt()
         )
         Text(text = "$current / $total g", fontSize = 14.sp)
