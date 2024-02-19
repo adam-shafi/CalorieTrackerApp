@@ -3,18 +3,14 @@ package com.example.calorietracker.ui.components
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -35,7 +31,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.ui.theme.dimen_110dp
-import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
 
 
@@ -67,11 +62,11 @@ fun CircularProgressbar(
 ) {
     // State to hold the data usage value for animation
     var dataUsageRemember by remember {
-        mutableFloatStateOf(-1f)
+        mutableFloatStateOf(0f)
     }
 
     var titleUsageRemember by remember {
-        mutableFloatStateOf(-1f)
+        mutableFloatStateOf(0f)
     }
 
     // State for animating the data usage value

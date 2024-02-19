@@ -16,6 +16,7 @@ data class Food(
     @PrimaryKey
     val foodId: Int,
 
+    val date: String,
     val mealId: Int,
     val name: String,
     val calories: Float,

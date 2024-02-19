@@ -19,6 +19,9 @@ interface FoodDao {
     @Query("SELECT * FROM Food WHERE foodId = :foodId")
     suspend fun getFoodById(foodId: Int): Food?
 
-    @Query("SELECT * FROM Food")
-    fun getAllFood(): Flow<List<Food>>
+    @Query("SELECT * FROM Food WHERE mealId = :mealId")
+    fun getAllFoodInMeal(mealId: Int): Flow<List<Food>>
+
+    @Query("SELECT * FROM Food WHERE date = :date")
+    fun getAllFood(date: String): Flow<List<Food>>
 }

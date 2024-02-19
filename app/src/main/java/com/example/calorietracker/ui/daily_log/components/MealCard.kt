@@ -26,16 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
 import com.example.calorietracker.ui.components.VerticalText
-import com.example.calorietracker.ui.daily_log.Meal
+import com.example.calorietracker.ui.daily_log.MealState
 import com.example.calorietracker.ui.theme.CarbRed
 import com.example.calorietracker.ui.theme.FatGreen
 import com.example.calorietracker.ui.theme.ProteinBlue
 import com.example.calorietracker.ui.theme.dimen_10dp
 import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
+import kotlin.math.roundToInt
 
 @Composable
-fun MealCard(meal: Meal) {
+fun MealCard(mealState: MealState) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,22 +52,22 @@ fun MealCard(meal: Meal) {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = meal.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "${meal.calories} cal")
+                Text(text = mealState.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = "${mealState.calories.roundToInt()} cal")
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                VerticalText(title = "${meal.protein} g", description = stringResource(id = R.string.protein), color = ProteinBlue)
-                VerticalText(title = "${meal.carbs} g", description = stringResource(id = R.string.carbs), color = CarbRed)
-                VerticalText(title = "${meal.fat} g", description = stringResource(id = R.string.fat), color = FatGreen)
+                VerticalText(title = "${mealState.protein.roundToInt()} g", description = stringResource(id = R.string.protein), color = ProteinBlue)
+                VerticalText(title = "${mealState.carbs.roundToInt()} g", description = stringResource(id = R.string.carbs), color = CarbRed)
+                VerticalText(title = "${mealState.fat.roundToInt()} g", description = stringResource(id = R.string.fat), color = FatGreen)
             }
-            meal.foods.forEach{ food ->
+            mealState.foods.forEach{ food ->
                 MealItem(
                     food = food.name,
-                    serving = "${food.servingAmount} ${food.servingUnits}",
-                    calories = "${food.calories} cal",
+                    serving = "${food.servingAmount.roundToInt()} ${food.servingUnits}",
+                    calories = "${food.calories.roundToInt()} cal",
                     painter = painterResource(id = food.iconId)
                 )
             }

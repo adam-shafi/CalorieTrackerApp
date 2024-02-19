@@ -16,5 +16,5 @@ data class Meal(
     @PrimaryKey
     val mealId: Int,
     val name: String,
-    val logDate: Long
+    val logDate: String
 )

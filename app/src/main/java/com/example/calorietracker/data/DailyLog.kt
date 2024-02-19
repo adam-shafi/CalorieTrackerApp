@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity
 data class DailyLog (
     @PrimaryKey
-    val date: Long,
+    val date: String,
 )
 

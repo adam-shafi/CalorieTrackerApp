@@ -1,93 +1,94 @@
 package com.example.calorietracker.ui.daily_log
 
+import androidx.compose.runtime.Stable
 import com.example.calorietracker.R
 
-
+@Stable
 data class DailyLogUiState(
-    var date: String = "Today",
-    var totalCalories: MacroInfo = MacroInfo(2000f, 1500f),
-    var totalProtein: MacroInfo = MacroInfo(175f, 50f),
-    var totalCarbs: MacroInfo = MacroInfo(50f, 0f),
-    var totalFat: MacroInfo = MacroInfo(30f, 0f),
-    var meals: List<Meal> = listOf(
-        Meal(
+    var date: String = "s",
+    var totalCalories: MacroInfoState = MacroInfoState(1f, 0f),
+    var totalProtein: MacroInfoState = MacroInfoState(150f, 0f),
+    var totalCarbs: MacroInfoState = MacroInfoState(5220f, 0f),
+    var totalFat: MacroInfoState = MacroInfoState(60f, 0f),
+    var meals: List<MealState> = listOf(
+        MealState(
             name = "Breakfast",
-            calories = 420,
-            protein = 50,
-            carbs = 25,
-            fat = 16,
+            calories = 420f,
+            protein = 50f,
+            carbs = 25f,
+            fat = 16f,
             foods = listOf(
-                Food(
+                FoodState(
                     name = "Ramen",
-                    calories = 160,
+                    calories = 160f,
                     iconId = R.drawable.chinese_food,
-                    servingAmount = 162,
+                    servingAmount = 162f,
                     servingUnits = "grams"
                 ),
-                Food(
+                FoodState(
                     name = "Rice",
-                    calories = 150,
+                    calories = 150f,
                     iconId = R.drawable.hot_food,
-                    servingAmount = 72,
+                    servingAmount = 72f,
                     servingUnits = "grams"
                 )
 
             )
         ),
-        Meal(
+        MealState(
             name = "Lunch",
-            calories = 130,
-            protein = 30,
-            carbs = 2,
-            fat = 3,
+            calories = 130f,
+            protein = 30f,
+            carbs = 2f,
+            fat = 3f,
             foods = listOf(
-                Food(
+                FoodState(
                     name = "Canned Tuna",
-                    calories = 130,
+                    calories = 130f,
                     iconId = R.drawable.canned_fish_food,
-                    servingAmount = 1,
+                    servingAmount = 1f,
                     servingUnits = "can"
                 )
 
             )
         ),
-        Meal(
+        MealState(
             name = "Dinner",
-            calories = 0,
-            protein = 0,
-            carbs = 0,
-            fat = 0,
+            calories = 0f,
+            protein = 0f,
+            carbs = 0f,
+            fat = 0f,
             foods = listOf()
         ),
-        Meal(
+        MealState(
             name = "Snacks",
-            calories = 0,
-            protein = 0,
-            carbs = 0,
-            fat = 0,
+            calories = 0f,
+            protein = 0f,
+            carbs = 0f,
+            fat = 0f,
             foods = listOf()
         )
     )
 )
 
-data class Meal(
+data class MealState(
     var name: String,
-    var calories: Int,
-    var protein: Int,
-    var carbs: Int,
-    var fat: Int,
-    var foods: List<Food>,
+    var calories: Float,
+    var protein: Float,
+    var carbs: Float,
+    var fat: Float,
+    var foods: List<FoodState>,
 )
 
-data class Food(
+data class FoodState(
     var name: String,
-    var calories: Int,
+    var calories: Float,
     var iconId: Int,
-    var servingAmount: Int,
+    var servingAmount: Float,
     var servingUnits: String
 )
 
-data class MacroInfo(
+data class MacroInfoState(
     var budget: Float,
     var foodEaten: Float
 )

@@ -7,7 +7,7 @@ interface DailyLogRepository {
 
     suspend fun deleteDailyLog(dailyLog: DailyLog)
 
-    suspend fun getTodoByDate(date: Long): DailyLog?
+    suspend fun getDailyLogByDate(date: String): DailyLog?
 
     suspend fun insertFood(food: Food)
 
@@ -15,7 +15,8 @@ interface DailyLogRepository {
 
     suspend fun getFoodById(foodId: Int): Food?
 
-    fun getAllFood(): Flow<List<Food>>
+    fun getAllFoodInMeal(mealId: Int): Flow<List<Food>>
+    fun getAllFood(date: String): Flow<List<Food>>
 
     suspend fun insertMeal(meal: Meal)
 
@@ -23,6 +24,12 @@ interface DailyLogRepository {
 
     suspend fun getMealById(mealId: Int): Meal?
 
-    fun getAllMeal(): Flow<List<Meal>>
+    fun getAllMeal(date: String): Flow<List<Meal>>
+
+    suspend fun insertNutritionBudget(nutritionBudget: NutritionBudget)
+
+    suspend fun deleteNutritionBudget(nutritionBudget: NutritionBudget)
+
+    suspend fun getNutritionBudget(): NutritionBudget?
 
 }

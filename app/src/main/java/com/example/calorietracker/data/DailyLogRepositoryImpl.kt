@@ -5,7 +5,8 @@ import kotlinx.coroutines.flow.Flow
 class DailyLogRepositoryImpl(
     private val dailyLogDao: DailyLogDao,
     private val mealDao: MealDao,
-    private val foodDao: FoodDao
+    private val foodDao: FoodDao,
+    private val nutritionBudgetDao: NutritionBudgetDao
 ) : DailyLogRepository {
     override suspend fun insertDailyLog(dailyLog: DailyLog) {
         dailyLogDao.insertDailyLog(dailyLog)
@@ -15,8 +16,8 @@ class DailyLogRepositoryImpl(
         dailyLogDao.deleteDailyLog(dailyLog)
     }
 
-    override suspend fun getTodoByDate(date: Long): DailyLog? {
-        return dailyLogDao.getTodoByDate(date)
+    override suspend fun getDailyLogByDate(date: String): DailyLog? {
+        return dailyLogDao.getDailyLogByDate(date)
     }
 
     override suspend fun insertFood(food: Food) {
@@ -31,8 +32,12 @@ class DailyLogRepositoryImpl(
         return foodDao.getFoodById(foodId)
     }
 
-    override fun getAllFood(): Flow<List<Food>> {
-        return foodDao.getAllFood()
+    override fun getAllFoodInMeal(mealId: Int): Flow<List<Food>> {
+        return foodDao.getAllFoodInMeal(mealId)
+    }
+
+    override fun getAllFood(date: String): Flow<List<Food>> {
+        return foodDao.getAllFood(date)
     }
 
     override suspend fun insertMeal(meal: Meal) {
@@ -47,9 +52,19 @@ class DailyLogRepositoryImpl(
         return mealDao.getMealById(mealId)
     }
 
-    override fun getAllMeal(): Flow<List<Meal>> {
-        return mealDao.getAllMeal()
+    override fun getAllMeal(date: String): Flow<List<Meal>> {
+        return mealDao.getAllMeal(date)
     }
 
+    override suspend fun insertNutritionBudget(nutritionBudget: NutritionBudget) {
+        nutritionBudgetDao.insertNutritionBudget(nutritionBudget)
+    }
 
+    override suspend fun deleteNutritionBudget(nutritionBudget: NutritionBudget) {
+        nutritionBudgetDao.deleteNutritionBudget(nutritionBudget)
+    }
+
+    override suspend fun getNutritionBudget(): NutritionBudget? {
+        return nutritionBudgetDao.getNutritionBudget()
+    }
 }

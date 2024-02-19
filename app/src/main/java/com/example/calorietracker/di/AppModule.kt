@@ -30,7 +30,8 @@ object AppModule {
         return DailyLogRepositoryImpl(
             dailyLogDao = db.dailyLogDao,
             mealDao = db.mealDao,
-            foodDao = db.foodDao
+            foodDao = db.foodDao,
+            nutritionBudgetDao = db.nutritionBudgetDao
         )
     }
 }

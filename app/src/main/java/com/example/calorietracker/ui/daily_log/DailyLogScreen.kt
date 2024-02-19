@@ -18,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,6 +36,9 @@ import com.example.calorietracker.ui.daily_log.components.MealCard
 fun DailyLogScreen(
     viewModel: DailyLogViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        viewModel.initializeUiState()
+    }
     val uiState by viewModel.uiState.collectAsState()
     val totalCalorieInfoState =
         remember(key1 = uiState.totalCalories.budget, key2 = uiState.totalCalories.foodEaten) {
@@ -105,8 +109,8 @@ fun DailyLogScreen(
                 )
                 Divider()
                 LazyColumn {
-                    items(uiState.meals) { meal ->
-                        MealCard(meal)
+                    items(uiState.meals) { mealState ->
+                        MealCard(mealState)
                     }
                 }
             }

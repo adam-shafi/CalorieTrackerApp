@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -27,7 +26,6 @@ import com.example.calorietracker.ui.components.TitleText
 import com.example.calorietracker.ui.components.VerticalText
 import com.example.calorietracker.ui.daily_log.DailyLogUiState
 import com.example.calorietracker.ui.daily_log.DerivedMacroInfoState
-import com.example.calorietracker.ui.daily_log.Nutrition
 import com.example.calorietracker.ui.theme.CactusGreen
 import com.example.calorietracker.ui.theme.CarbRed
 import com.example.calorietracker.ui.theme.CarbRedGradient
