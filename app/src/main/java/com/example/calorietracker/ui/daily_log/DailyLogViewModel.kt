@@ -2,9 +2,15 @@ package com.example.calorietracker.ui.daily_log
 
 import androidx.lifecycle.ViewModel
 import com.example.calorietracker.R
+import com.example.calorietracker.data.DailyLogRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import java.time.Instant
+import java.time.MonthDay
+import java.time.ZonedDateTime
+import javax.inject.Inject
 import kotlin.math.abs
 
 enum class Nutrition {
@@ -14,7 +20,10 @@ enum class Nutrition {
     Fat
 }
 
-class DailyLogViewModel() : ViewModel() {
+@HiltViewModel
+class DailyLogViewModel @Inject constructor(
+    private val repository: DailyLogRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DailyLogUiState())
     val uiState = _uiState.asStateFlow()

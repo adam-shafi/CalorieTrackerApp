@@ -4,7 +4,7 @@ import com.example.calorietracker.R
 
 
 data class DailyLogUiState(
-    var date: String = "",
+    var date: String = "Today",
     var totalCalories: MacroInfo = MacroInfo(2000f, 1500f),
     var totalProtein: MacroInfo = MacroInfo(175f, 50f),
     var totalCarbs: MacroInfo = MacroInfo(50f, 0f),

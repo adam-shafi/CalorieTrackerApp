@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.calorietracker.R
 import com.example.calorietracker.ui.daily_log.components.DatePickerBar
 import com.example.calorietracker.ui.daily_log.components.MacroSnapshot
@@ -32,7 +33,7 @@ import com.example.calorietracker.ui.daily_log.components.MealCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DailyLogScreen(
-    viewModel: DailyLogViewModel
+    viewModel: DailyLogViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val totalCalorieInfoState =
