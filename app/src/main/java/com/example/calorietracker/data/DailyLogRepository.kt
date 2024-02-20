@@ -1,7 +1,5 @@
 package com.example.calorietracker.data
 
-import kotlinx.coroutines.flow.Flow
-
 interface DailyLogRepository {
     suspend fun insertDailyLog(dailyLog: DailyLog)
 
@@ -15,16 +13,18 @@ interface DailyLogRepository {
 
     suspend fun getFoodById(foodId: Int): Food?
 
-    fun getAllFoodInMeal(mealId: Int): Flow<List<Food>>
-    fun getAllFood(date: String): Flow<List<Food>>
+    fun getAllFoodInMeal(mealName: String): List<Food>
+    fun getAllFood(date: String): List<Food>
 
     suspend fun insertMeal(meal: Meal)
 
     suspend fun deleteMeal(meal: Meal)
 
-    suspend fun getMealById(mealId: Int): Meal?
+    suspend fun getMeal(name: String, date: String): Meal?
 
-    fun getAllMeal(date: String): Flow<List<Meal>>
+    fun getAllMeal(date: String): List<Meal>
+
+    fun getAllMeal(): List<Meal>
 
     suspend fun insertNutritionBudget(nutritionBudget: NutritionBudget)
 

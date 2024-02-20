@@ -21,7 +21,9 @@ object AppModule {
             app,
             DailyLogDatabase::class.java,
             "daily_log_db"
-        ).build()
+        )
+//            .fallbackToDestructiveMigration() // for when you feel devious...
+            .build()
     }
 
     @Provides

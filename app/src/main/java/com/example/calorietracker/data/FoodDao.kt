@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FoodDao {
@@ -19,9 +18,9 @@ interface FoodDao {
     @Query("SELECT * FROM Food WHERE foodId = :foodId")
     suspend fun getFoodById(foodId: Int): Food?
 
-    @Query("SELECT * FROM Food WHERE mealId = :mealId")
-    fun getAllFoodInMeal(mealId: Int): Flow<List<Food>>
+    @Query("SELECT * FROM Food WHERE mealName = :mealName")
+    fun getAllFoodInMeal(mealName: String): List<Food>
 
     @Query("SELECT * FROM Food WHERE date = :date")
-    fun getAllFood(date: String): Flow<List<Food>>
+    fun getAllFood(date: String): List<Food>
 }

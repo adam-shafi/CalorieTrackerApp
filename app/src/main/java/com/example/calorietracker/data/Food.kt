@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 @Entity(
     foreignKeys = [ForeignKey(
         entity = Meal::class,
-        parentColumns = arrayOf("mealId"),
-        childColumns = arrayOf("mealId"),
+        parentColumns = arrayOf("name", "logDate"),
+        childColumns = arrayOf("mealName", "date"),
         onDelete = ForeignKey.CASCADE
     )]
 )
@@ -17,7 +17,7 @@ data class Food(
     val foodId: Int,
 
     val date: String,
-    val mealId: Int,
+    val mealName: String,
     val name: String,
     val calories: Float,
     val protein: Float,

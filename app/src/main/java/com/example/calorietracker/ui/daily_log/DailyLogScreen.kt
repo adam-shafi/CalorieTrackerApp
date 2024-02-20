@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,9 +37,6 @@ import com.example.calorietracker.ui.daily_log.components.MealCard
 fun DailyLogScreen(
     viewModel: DailyLogViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(Unit) {
-        viewModel.initializeUiState()
-    }
     val uiState by viewModel.uiState.collectAsState()
     val totalCalorieInfoState =
         remember(key1 = uiState.totalCalories.budget, key2 = uiState.totalCalories.foodEaten) {

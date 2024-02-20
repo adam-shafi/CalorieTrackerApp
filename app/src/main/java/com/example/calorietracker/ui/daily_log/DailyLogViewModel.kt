@@ -3,17 +3,19 @@ package com.example.calorietracker.ui.daily_log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.example.calorietracker.R
+import com.example.calorietracker.data.DailyLog
 import com.example.calorietracker.data.DailyLogRepository
 import com.example.calorietracker.data.Food
 import com.example.calorietracker.data.Meal
 import com.example.calorietracker.data.NutritionBudget
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -37,38 +39,67 @@ class DailyLogViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(DailyLogUiState())
     val uiState = _uiState.asStateFlow()
 
-    suspend fun initializeUiState() {
-        val date = getDateId(dateInstant)
-        val foodFlow = repository.getAllFood(date)
-        val mealFlow = repository.getAllMeal(date)
-        val eaten = calculateEaten(foodFlow)
-        _uiState.update { currentState ->
-            currentState.copy(
-                date = getDateString(dateInstant),
-                totalCalories = MacroInfoState(
-                    budget = repository.getNutritionBudget()?.caloriesBudget ?: 2000f,
-                    foodEaten = eaten.caloriesBudget
-                ),
-                totalProtein = MacroInfoState(
-                    budget = repository.getNutritionBudget()?.proteinBudget ?: 150f,
-                    foodEaten = eaten.proteinBudget
-                ),
-                totalCarbs = MacroInfoState(
-                    budget = repository.getNutritionBudget()?.carbsBudget ?: 50f,
-                    foodEaten = eaten.carbsBudget
-                ),
 
-                totalFat = MacroInfoState(
-                    budget = repository.getNutritionBudget()?.fatBudget ?: 60f,
-                    foodEaten = eaten.fatBudget
-                ),
-                meals = generateMealState(
-                    mealFlow = mealFlow,
-                    foodFlow = foodFlow
+    init {
+        val date = getDateId(dateInstant)
+        val dateString = getDateString(dateInstant)
+        viewModelScope.launch(Dispatchers.IO) {
+            val dailyLog = repository.getDailyLogByDate(date)
+            if(dailyLog == null){
+                repository.insertDailyLog(DailyLog(date = date))
+                repository.insertMeal(Meal(name = "Breakfast", logDate = date))
+                repository.insertMeal(Meal(name = "Lunch", logDate = date))
+                repository.insertMeal(Meal(name = "Dinner", logDate = date))
+                repository.insertMeal(Meal(name = "Snacks", logDate = date))
+            }
+            val meals = repository.getAllMeal(date)
+            val foods = repository.getAllFood(date)
+
+            val eaten = calculateEaten(foods)
+            _uiState.update { currentState ->
+                currentState.copy(
+                    date = dateString,
+                    totalCalories = MacroInfoState(
+                        budget = repository.getNutritionBudget()?.caloriesBudget ?: 2000f,
+                        foodEaten = eaten.caloriesBudget
+                    ),
+                    totalProtein = MacroInfoState(
+                        budget = repository.getNutritionBudget()?.proteinBudget ?: 150f,
+                        foodEaten = eaten.proteinBudget
+                    ),
+                    totalCarbs = MacroInfoState(
+                        budget = repository.getNutritionBudget()?.carbsBudget ?: 50f,
+                        foodEaten = eaten.carbsBudget
+                    ),
+
+                    totalFat = MacroInfoState(
+                        budget = repository.getNutritionBudget()?.fatBudget ?: 60f,
+                        foodEaten = eaten.fatBudget
+                    ),
+                    meals = generateMealState(
+                        meals = meals,
+                        foods = foods
+                    )
                 )
-            )
+            }
         }
     }
+
+//    fun update() {
+//        viewModelScope.launch {
+//            val date = getDateId(dateInstant)
+//            val foodLiveData = repository.getAllFood(date).asLiveData()
+//            val mealLiveData = repository.getAllMeal(date).asLiveData()
+//            _uiState.update { currentState ->
+//                currentState.copy(
+//                    meals = generateMealState(
+//                        mealLiveData = mealLiveData,
+//                        foodLiveData = foodLiveData
+//                    )
+//                )
+//            }
+//        }
+//    }
 
 
     fun calculateCalorieState(budget: Float, current: Float): DerivedMacroInfoState {
@@ -98,7 +129,7 @@ class DailyLogViewModel @Inject constructor(
     }
 
     private fun getDateId(instant: Instant): String {
-        val current = LocalDateTime.ofInstant(instant, ZoneId.of("UTC"))
+        val current = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
         return "${current.dayOfMonth}-${current.monthValue}-${current.year}"
     }
 
@@ -132,16 +163,15 @@ class DailyLogViewModel @Inject constructor(
         return "${current.month.name}, ${current.dayOfMonth}"
     }
 
-    private suspend fun calculateEaten(foodFlow: Flow<List<Food>>): NutritionBudget {
+    private fun calculateEaten(foods: List<Food>): NutritionBudget {
         var nutrition = NutritionBudget(
             caloriesBudget = 0f,
             proteinBudget = 0f,
             fatBudget = 0f,
             carbsBudget = 0f
         )
-        val foodLiveData = foodFlow.asLiveData()
 
-        foodLiveData.value?.forEach { food ->
+        foods.forEach { food ->
             nutrition = nutrition.copy(
                 caloriesBudget = nutrition.caloriesBudget + food.calories,
                 proteinBudget = nutrition.proteinBudget + food.protein,
@@ -153,16 +183,13 @@ class DailyLogViewModel @Inject constructor(
         return nutrition
     }
 
-    private suspend fun generateMealState(
-        mealFlow: Flow<List<Meal>>,
-        foodFlow: Flow<List<Food>>
+    private fun generateMealState(
+        meals: List<Meal>,
+        foods: List<Food>
     ): List<MealState> {
-        val meals = mealFlow.asLiveData()
-        val foods = foodFlow.asLiveData()
         val mealList = mutableListOf<MealState>()
 
-
-        meals.value?.forEach { meal ->
+        meals.forEach { meal ->
             val foodList = mutableListOf<FoodState>()
             var nutrition = NutritionBudget(
                 caloriesBudget = 0f,
@@ -170,8 +197,8 @@ class DailyLogViewModel @Inject constructor(
                 carbsBudget = 0f,
                 fatBudget = 0f
             )
-            foods.value?.forEach { food ->
-                if (food.mealId == meal.mealId) {
+            foods.forEach { food ->
+                if (food.mealName == meal.name) {
                     foodList.add(
                         FoodState(
                             name = food.name,

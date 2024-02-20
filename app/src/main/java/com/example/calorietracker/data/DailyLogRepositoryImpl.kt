@@ -1,7 +1,5 @@
 package com.example.calorietracker.data
 
-import kotlinx.coroutines.flow.Flow
-
 class DailyLogRepositoryImpl(
     private val dailyLogDao: DailyLogDao,
     private val mealDao: MealDao,
@@ -32,11 +30,11 @@ class DailyLogRepositoryImpl(
         return foodDao.getFoodById(foodId)
     }
 
-    override fun getAllFoodInMeal(mealId: Int): Flow<List<Food>> {
-        return foodDao.getAllFoodInMeal(mealId)
+    override fun getAllFoodInMeal(mealName: String): List<Food> {
+        return foodDao.getAllFoodInMeal(mealName)
     }
 
-    override fun getAllFood(date: String): Flow<List<Food>> {
+    override fun getAllFood(date: String): List<Food> {
         return foodDao.getAllFood(date)
     }
 
@@ -48,12 +46,16 @@ class DailyLogRepositoryImpl(
         mealDao.deleteMeal(meal)
     }
 
-    override suspend fun getMealById(mealId: Int): Meal? {
-        return mealDao.getMealById(mealId)
+    override suspend fun getMeal(name: String, date: String): Meal? {
+        return mealDao.getMeal(name, date)
     }
 
-    override fun getAllMeal(date: String): Flow<List<Meal>> {
+    override fun getAllMeal(date: String): List<Meal> {
         return mealDao.getAllMeal(date)
+    }
+
+    override fun getAllMeal(): List<Meal> {
+        return mealDao.getAllMeal()
     }
 
     override suspend fun insertNutritionBudget(nutritionBudget: NutritionBudget) {

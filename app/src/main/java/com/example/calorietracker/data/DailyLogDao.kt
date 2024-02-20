@@ -5,7 +5,6 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DailyLogDao {
@@ -20,5 +19,5 @@ interface DailyLogDao {
     suspend fun getDailyLogByDate(date: String): DailyLog?
 
     @Query("SELECT * FROM DailyLog")
-    fun getAllDailyLog(): Flow<List<DailyLog>>
+    fun getAllDailyLog(): List<DailyLog>
 }
