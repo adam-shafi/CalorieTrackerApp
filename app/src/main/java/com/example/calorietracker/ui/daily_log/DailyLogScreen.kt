@@ -1,13 +1,12 @@
 package com.example.calorietracker.ui.daily_log
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -19,7 +18,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -32,7 +30,7 @@ import com.example.calorietracker.ui.daily_log.components.DatePickerBar
 import com.example.calorietracker.ui.daily_log.components.MacroSnapshot
 import com.example.calorietracker.ui.daily_log.components.MealCard
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DailyLogScreen(
     viewModel: DailyLogViewModel = hiltViewModel()
@@ -95,22 +93,28 @@ fun DailyLogScreen(
         }
     ) { paddingValues ->
         Surface(modifier = Modifier.padding(paddingValues)) {
-            Column {
-                DatePickerBar(date = uiState.date)
-                Divider()
-                MacroSnapshot(
-                    uiState = uiState,
-                    calorieInfoState = totalCalorieInfoState,
-                    proteinInfoState = totalProteinInfoState,
-                    carbInfoState = totalCarbInfoState,
-                    fatInfoState = totalFatInfoState
-                )
-                Divider()
-                LazyColumn {
-                    items(uiState.meals) { mealState ->
-                        MealCard(mealState)
-                    }
+            LazyColumn {
+                stickyHeader {
+                    DatePickerBar(
+                        date = uiState.date,
+                        updateDate = { updatedMillis -> viewModel.updateDate(updatedMillis) },
+                        updateDateByDays = { daysChanged -> viewModel.updateDateByDays(daysChanged) }
+                    )
+                    Divider()
+                    MacroSnapshot(
+                        uiState = uiState,
+                        calorieInfoState = totalCalorieInfoState,
+                        proteinInfoState = totalProteinInfoState,
+                        carbInfoState = totalCarbInfoState,
+                        fatInfoState = totalFatInfoState
+                    )
+                    Divider()
                 }
+
+                items(uiState.meals) { mealState ->
+                    MealCard(mealState)
+                }
+
             }
         }
     }
