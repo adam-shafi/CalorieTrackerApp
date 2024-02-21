@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
+import com.example.calorietracker.ui.daily_log.Swipe
 import com.example.calorietracker.ui.theme.dimen_8dp
 import java.time.Instant
 import java.time.ZoneId
@@ -40,7 +41,7 @@ import java.time.ZonedDateTime
 fun DatePickerBar(
     date: String,
     updateDate: (Long) -> Unit,
-    updateDateByDays: (Long) -> Unit
+    updateDateBySwipe: (Swipe) -> Unit
 ) {
 
     var isModalOpen by remember { mutableStateOf(false) }
@@ -54,7 +55,7 @@ fun DatePickerBar(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            IconButton(onClick = { updateDateByDays(-1L) }) {
+            IconButton(onClick = { updateDateBySwipe(Swipe.Left) }) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowLeft,
                     contentDescription = "Navigate Back"
@@ -67,7 +68,7 @@ fun DatePickerBar(
                 Spacer(Modifier.width(dimen_8dp))
                 Text(text = date, fontSize = 16.sp)
             }
-            IconButton(onClick = { updateDateByDays(1L) }) {
+            IconButton(onClick = { updateDateBySwipe(Swipe.Right) }) {
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowRight,
                     contentDescription = "Navigate forward"

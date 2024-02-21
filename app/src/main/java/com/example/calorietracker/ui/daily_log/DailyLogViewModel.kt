@@ -32,6 +32,11 @@ enum class Nutrition {
     Fat
 }
 
+enum class Swipe {
+    Left,
+    Right
+}
+
 
 @HiltViewModel
 class DailyLogViewModel @Inject constructor(
@@ -241,9 +246,8 @@ class DailyLogViewModel @Inject constructor(
         return mealList.toList()
     }
 
-    fun updateDateByDays(daysChanged: Long) {
-        val updated = dateInstant.plus(daysChanged, ChronoUnit.DAYS)
-
+    fun updateDateBySwipe(swipe: Swipe) {
+        val updated = dateInstant.plus(if (swipe == Swipe.Left) -1L else 1L, ChronoUnit.DAYS)
         updateDate(updated)
     }
 

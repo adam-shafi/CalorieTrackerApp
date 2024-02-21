@@ -1,6 +1,9 @@
 package com.example.calorietracker.ui.daily_log
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +23,9 @@ import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -36,6 +41,10 @@ fun DailyLogScreen(
     viewModel: DailyLogViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var isSwipeToTheLeft by remember { mutableStateOf(false) }
+    val dragState = rememberDraggableState(onDelta = { delta ->
+        isSwipeToTheLeft = delta > 0
+    })
     val totalCalorieInfoState =
         remember(key1 = uiState.totalCalories.budget, key2 = uiState.totalCalories.foodEaten) {
             viewModel.calculateCalorieState(
@@ -92,13 +101,24 @@ fun DailyLogScreen(
             )
         }
     ) { paddingValues ->
-        Surface(modifier = Modifier.padding(paddingValues)) {
+        Surface(modifier = Modifier
+            .padding(paddingValues)
+            .draggable(
+                state = dragState,
+                orientation = Orientation.Horizontal,
+                onDragStarted = {
+
+                },
+                onDragStopped = {
+                    viewModel.updateDateBySwipe(if(isSwipeToTheLeft) Swipe.Left else Swipe.Right)
+                }
+            )) {
             LazyColumn {
                 stickyHeader {
                     DatePickerBar(
                         date = uiState.date,
                         updateDate = { updatedMillis -> viewModel.updateDate(updatedMillis) },
-                        updateDateByDays = { daysChanged -> viewModel.updateDateByDays(daysChanged) }
+                        updateDateBySwipe = { swipe -> viewModel.updateDateBySwipe(swipe) }
                     )
                     Divider()
                     MacroSnapshot(
