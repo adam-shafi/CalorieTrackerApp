@@ -143,7 +143,7 @@ class DailyLogViewModel @Inject constructor(
         return budget < current
     }
 
-    private fun getDateId(instant: Instant, timezone: ZoneId = ZoneId.systemDefault()): String {
+    fun getDateId(instant: Instant = dateInstant, timezone: ZoneId = ZoneId.systemDefault()): String {
         val current = LocalDateTime.ofInstant(instant, timezone)
         return "${current.dayOfMonth}-${current.monthValue}-${current.year}"
     }

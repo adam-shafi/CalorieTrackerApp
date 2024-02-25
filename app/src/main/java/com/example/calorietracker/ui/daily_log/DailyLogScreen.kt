@@ -41,7 +41,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DailyLogScreen(
-    viewModel: DailyLogViewModel = hiltViewModel()
+    viewModel: DailyLogViewModel = hiltViewModel(),
+    onAddClick: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val scrollCoroutine = rememberCoroutineScope()
@@ -153,7 +154,10 @@ fun DailyLogScreen(
                     }
 
                     items(uiState.meals) { mealState ->
-                        MealCard(mealState)
+                        MealCard(
+                            mealState = mealState,
+                            onAddClick = { mealName -> onAddClick(mealName, viewModel.getDateId()) }
+                        )
                     }
                 }
             }

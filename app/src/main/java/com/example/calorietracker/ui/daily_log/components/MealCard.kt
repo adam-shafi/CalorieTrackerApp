@@ -36,7 +36,10 @@ import com.example.calorietracker.ui.theme.dimen_8dp
 import kotlin.math.roundToInt
 
 @Composable
-fun MealCard(mealState: MealState) {
+fun MealCard(
+    mealState: MealState,
+    onAddClick: (String) -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -76,7 +79,7 @@ fun MealCard(mealState: MealState) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = { onAddClick(mealState.name) }) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically

@@ -3,7 +3,7 @@ package com.example.calorietracker
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.calorietracker.ui.daily_log.DailyLogScreen
+import com.example.calorietracker.navigation.CalorieTrackerNavHost
 import com.example.calorietracker.ui.theme.CalorieTrackerTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -14,8 +14,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             CalorieTrackerTheme {
-                DailyLogScreen()
+                CalorieTrackerNavHost()
             }
         }
     }
+
+
+
 }
