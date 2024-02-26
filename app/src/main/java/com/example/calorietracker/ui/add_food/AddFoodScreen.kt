@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -29,7 +28,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -46,8 +45,8 @@ fun AddFoodScreen(
     onBackClick: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var searchText by remember { mutableStateOf("") }
-    var isMealSelectOpen by remember { mutableStateOf(false) }
+    var searchText by rememberSaveable { mutableStateOf("") }
+    var isMealSelectOpen by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -136,7 +135,7 @@ fun AddFoodScreen(
                     trailingIcon = {
                         if (searchText.isNotEmpty()) {
                             IconButton(onClick = { searchText = "" }) {
-                                Icon(imageVector = Icons.Filled.Clear, contentDescription = "Clear")
+                                Icon(imageVector = ImageVector.vectorResource(R.drawable.cancel), contentDescription = "Clear")
                             }
                         }
                     },
