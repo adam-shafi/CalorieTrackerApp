@@ -81,8 +81,6 @@ fun AddFoodTopAppBar(
                     )
                 }
             }
-
-
         },
         actions = {
             IconButton(onClick = { /*TODO*/ }) {
