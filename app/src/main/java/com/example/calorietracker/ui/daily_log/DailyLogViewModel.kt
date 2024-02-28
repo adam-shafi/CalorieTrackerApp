@@ -2,6 +2,7 @@ package com.example.calorietracker.ui.daily_log
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.calorietracker.R
@@ -19,7 +20,8 @@ import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -30,58 +32,71 @@ enum class Nutrition {
     Fat
 }
 
+enum class Swipe {
+    Left,
+    Right
+}
+
 
 @HiltViewModel
 class DailyLogViewModel @Inject constructor(
     private val repository: DailyLogRepository
 ) : ViewModel() {
-    private val dateInstant by mutableStateOf(Instant.now())
+    private var dateInstant by mutableStateOf(
+        LocalDateTime.now(ZoneId.systemDefault()).toInstant(
+            ZoneOffset.of("+0")
+        )
+    )
     private val _uiState = MutableStateFlow(DailyLogUiState())
     val uiState = _uiState.asStateFlow()
 
 
     init {
-        val date = getDateId(dateInstant)
+        val dateId = getDateId(dateInstant)
         val dateString = getDateString(dateInstant)
         viewModelScope.launch(Dispatchers.IO) {
-            val dailyLog = repository.getDailyLogByDate(date)
-            if(dailyLog == null){
-                repository.insertDailyLog(DailyLog(date = date))
-                repository.insertMeal(Meal(name = "Breakfast", logDate = date))
-                repository.insertMeal(Meal(name = "Lunch", logDate = date))
-                repository.insertMeal(Meal(name = "Dinner", logDate = date))
-                repository.insertMeal(Meal(name = "Snacks", logDate = date))
-            }
-            val meals = repository.getAllMeal(date)
-            val foods = repository.getAllFood(date)
+            updateUiState(dateId = dateId, dateString = dateString)
+        }
+    }
 
-            val eaten = calculateEaten(foods)
-            _uiState.update { currentState ->
-                currentState.copy(
-                    date = dateString,
-                    totalCalories = MacroInfoState(
-                        budget = repository.getNutritionBudget()?.caloriesBudget ?: 2000f,
-                        foodEaten = eaten.caloriesBudget
-                    ),
-                    totalProtein = MacroInfoState(
-                        budget = repository.getNutritionBudget()?.proteinBudget ?: 150f,
-                        foodEaten = eaten.proteinBudget
-                    ),
-                    totalCarbs = MacroInfoState(
-                        budget = repository.getNutritionBudget()?.carbsBudget ?: 50f,
-                        foodEaten = eaten.carbsBudget
-                    ),
+    private suspend fun updateUiState(dateId: String, dateString: String) {
+        val dailyLog = repository.getDailyLogByDate(dateId)
+        if (dailyLog == null) {
+            repository.insertDailyLog(DailyLog(date = dateId))
+            repository.insertMeal(Meal(name = "Breakfast", logDate = dateId))
+            repository.insertMeal(Meal(name = "Lunch", logDate = dateId))
+            repository.insertMeal(Meal(name = "Dinner", logDate = dateId))
+            repository.insertMeal(Meal(name = "Snacks", logDate = dateId))
+        }
+        val meals = repository.getAllMeal(dateId)
+        val foods = repository.getAllFood(dateId)
 
-                    totalFat = MacroInfoState(
-                        budget = repository.getNutritionBudget()?.fatBudget ?: 60f,
-                        foodEaten = eaten.fatBudget
-                    ),
-                    meals = generateMealState(
-                        meals = meals,
-                        foods = foods
-                    )
+        val eaten = calculateEaten(foods)
+        _uiState.update { currentState ->
+            currentState.copy(
+                date = dateString,
+                totalCalories = MacroInfoState(
+                    budget = repository.getNutritionBudget()?.caloriesBudget ?: 2000f,
+                    foodEaten = eaten.caloriesBudget
+                ),
+                totalProtein = MacroInfoState(
+                    budget = repository.getNutritionBudget()?.proteinBudget ?: 150f,
+                    foodEaten = eaten.proteinBudget
+                ),
+                totalCarbs = MacroInfoState(
+                    budget = repository.getNutritionBudget()?.carbsBudget ?: 50f,
+                    foodEaten = eaten.carbsBudget
+                ),
+
+                totalFat = MacroInfoState(
+                    budget = repository.getNutritionBudget()?.fatBudget ?: 60f,
+                    foodEaten = eaten.fatBudget
+                ),
+                meals = generateMealState(
+                    meals = meals,
+                    foods = foods
                 )
-            }
+            )
         }
     }
 
@@ -128,36 +143,36 @@ class DailyLogViewModel @Inject constructor(
         return budget < current
     }
 
-    private fun getDateId(instant: Instant): String {
-        val current = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+    fun getDateId(instant: Instant = dateInstant, timezone: ZoneId = ZoneId.systemDefault()): String {
+        val current = LocalDateTime.ofInstant(instant, timezone)
         return "${current.dayOfMonth}-${current.monthValue}-${current.year}"
     }
 
-    private fun getDateString(instant: Instant): String {
-        val current = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault())
-        val before = ZonedDateTime
+    private fun getDateString(instant: Instant, timezone: ZoneId = ZoneId.systemDefault()): String {
+        val current = LocalDateTime.ofInstant(instant, timezone)
+        var before = LocalDateTime
             .now()
             .withHour(0)
             .withMinute(0)
             .withSecond(0)
             .withNano(0)
-        val after = ZonedDateTime
+        var after = LocalDateTime
             .now()
             .withHour(23)
             .withMinute(59)
             .withSecond(59)
             .withNano(999999999)
-        if (current.isAfter(before) && current.isBefore(after)) {
+        if ((current.isEqual(before) || current.isAfter(before)) && current.isBefore(after)) {
             return "Today"
         }
-        before.minusDays(1)
-        after.minusDays(1)
-        if (current.isAfter(before) && current.isBefore(after)) {
+        before = before.minusDays(1)
+        after = after.minusDays(1)
+        if ((current.isEqual(before) || current.isAfter(before)) && current.isBefore(after)) {
             return "Yesterday"
         }
-        before.plusDays(2)
-        after.plusDays(2)
-        if (current.isAfter(before) && current.isBefore(after)) {
+        before = before.plusDays(2)
+        after = after.plusDays(2)
+        if ((current.isEqual(before) || current.isAfter(before)) && current.isBefore(after)) {
             return "Tomorrow"
         }
         return "${current.month.name}, ${current.dayOfMonth}"
@@ -229,6 +244,25 @@ class DailyLogViewModel @Inject constructor(
         }
 
         return mealList.toList()
+    }
+
+    fun updateDateBySwipe(swipe: Swipe) {
+        val updated = dateInstant.plus(if (swipe == Swipe.Left) -1L else 1L, ChronoUnit.DAYS)
+        updateDate(updated)
+    }
+
+    fun updateDate(millisInUTC: Long) {
+        val instant = Instant.ofEpochMilli(millisInUTC)
+        updateDate(instant = instant)
+    }
+
+    private fun updateDate(instant: Instant) {
+        val dateId = getDateId(instant, ZoneId.of("UTC"))
+        val dateString = getDateString(instant, ZoneId.of("UTC"))
+        dateInstant = instant
+        viewModelScope.launch(Dispatchers.IO) {
+            updateUiState(dateId = dateId, dateString = dateString)
+        }
     }
 
 
