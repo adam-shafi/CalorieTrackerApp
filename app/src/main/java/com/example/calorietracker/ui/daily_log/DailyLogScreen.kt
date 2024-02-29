@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Divider
@@ -42,6 +43,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun DailyLogScreen(
     viewModel: DailyLogViewModel = hiltViewModel(),
+    onProfileClick: () -> Unit,
     onAddClick: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -97,9 +99,9 @@ fun DailyLogScreen(
                             contentDescription = stringResource(R.string.statistics)
                         )
                     }
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = onProfileClick) {
                         Icon(
-                            imageVector = Icons.Outlined.Settings,
+                            imageVector = Icons.Outlined.AccountCircle,
                             contentDescription = stringResource(R.string.edit)
                         )
                     }

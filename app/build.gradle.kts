@@ -4,6 +4,7 @@ plugins {
     kotlin("kapt")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -72,7 +73,7 @@ dependencies {
 
     // Compose Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Dagger Hilt Injection
     implementation("com.google.dagger:hilt-android:2.50")
@@ -84,6 +85,14 @@ dependencies {
 
     // Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.6.1")
+
+    //Firebase
+    implementation(platform("com.google.firebase:firebase-bom:32.7.3"))
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
+
+    implementation("com.google.firebase:firebase-auth")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }
 
 // Allow references to generated code
