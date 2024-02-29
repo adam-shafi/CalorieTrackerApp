@@ -22,3 +22,7 @@ val CarbRedGradient = Color(0xFFDC143C)
 
 val FatGreen = Color(0xFF50C878)
 val FatGreenGradient = Color(0xFF228B22)
+
+val BrandOrange = Color(0XFFF7A02D)
+val BrandLightBlue = Color(0xFF31A7FF)
+val BrandDarkBlue = Color(0xFF113A54)

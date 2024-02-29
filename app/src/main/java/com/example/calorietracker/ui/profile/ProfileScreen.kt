@@ -55,12 +55,12 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
         }
-        Text(
-            text = userData?.userId ?: "",
-            textAlign = TextAlign.Center,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+//        Text(
+//            text = userData?.userId ?: "",
+//            textAlign = TextAlign.Center,
+//            fontSize = 36.sp,
+//            fontWeight = FontWeight.SemiBold
+//        )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = onSignOut) {
             Text(text = "Sign out")
