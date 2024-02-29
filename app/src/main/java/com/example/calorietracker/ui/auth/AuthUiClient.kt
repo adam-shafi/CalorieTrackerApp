@@ -61,66 +61,54 @@ class AuthUiClient(
 
     suspend fun signUpWithEmailAndPassword(email: String, password: String): SignInResult {
         val tag = "Firebase sign up with email and password"
-        var signInResult = SignInResult()
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(tag, "createUserWithEmail:success")
-                    val user = auth.currentUser
-                    signInResult = SignInResult(
-                        data = user?.run {
-                            UserData(
-                                userId = uid,
-                                username = displayName,
-                                email = email,
-                                profilePictureUrl = photoUrl?.toString()
-                            )
-                        },
-                        errorMessage = null
+        return try {
+            val user = auth.createUserWithEmailAndPassword(email, password).await().user
+            Log.d(tag, "createUserWithEmail:success")
+            SignInResult(
+                data = user?.run {
+                    UserData(
+                        userId = uid,
+                        username = displayName,
+                        profilePictureUrl = photoUrl?.toString()
                     )
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(tag, "createUserWithEmail:failure", task.exception)
-                    signInResult = SignInResult(
-                        data = null,
-                        errorMessage = task.exception?.message ?: "Authentication Failed"
-                    )
-                }
-            }.await()
-        return signInResult
+                },
+                errorMessage = null
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            if (e is CancellationException) throw e
+            Log.w(tag, "createUserWithEmail:failure", e)
+            SignInResult(
+                data = null,
+                errorMessage = e.message
+            )
+        }
     }
 
     suspend fun signInWithEmailAndPassword(email: String, password: String): SignInResult {
         val tag = "Firebase sign in with email and password"
-        var signInResult = SignInResult()
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(tag, "signInWithEmail:success")
-                    val user = auth.currentUser
-                    signInResult = SignInResult(
-                        data = user?.run {
-                            UserData(
-                                userId = uid,
-                                username = displayName,
-                                email = email,
-                                profilePictureUrl = photoUrl?.toString()
-                            )
-                        },
-                        errorMessage = null
+        return try {
+            val user = auth.signInWithEmailAndPassword(email, password).await().user
+            Log.d(tag, "signInWithEmail:success")
+            SignInResult(
+                data = user?.run {
+                    UserData(
+                        userId = uid,
+                        username = displayName,
+                        profilePictureUrl = photoUrl?.toString()
                     )
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(tag, "signInWithEmail:failure", task.exception)
-                    signInResult = SignInResult(
-                        data = null,
-                        errorMessage = task.exception?.message ?: "Authentication Failed"
-                    )
-                }
-            }.await()
-        return signInResult
+                },
+                errorMessage = null
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            if (e is CancellationException) throw e
+            Log.w(tag, "signInWithEmail:failure", e)
+            SignInResult(
+                data = null,
+                errorMessage = e.message
+            )
+        }
     }
 
     suspend fun signOut() {

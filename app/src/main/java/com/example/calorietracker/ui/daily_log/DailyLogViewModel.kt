@@ -22,6 +22,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -175,7 +176,7 @@ class DailyLogViewModel @Inject constructor(
         if ((current.isEqual(before) || current.isAfter(before)) && current.isBefore(after)) {
             return "Tomorrow"
         }
-        return "${current.month.name}, ${current.dayOfMonth}"
+        return "${current.month.name.lowercase().capitalized()}, ${current.dayOfMonth}"
     }
 
     private fun calculateEaten(foods: List<Food>): NutritionBudget {
@@ -327,6 +328,12 @@ class DailyLogViewModel @Inject constructor(
 
 }
 
-
+fun String.capitalized(): String {
+    return this.replaceFirstChar {
+        if (it.isLowerCase())
+            it.titlecase(Locale.getDefault())
+        else it.toString()
+    }
+}
 
 
