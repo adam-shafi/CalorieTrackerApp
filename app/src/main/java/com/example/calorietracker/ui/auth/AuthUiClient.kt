@@ -10,6 +10,7 @@ import com.google.android.gms.auth.api.identity.BeginSignInRequest.GoogleIdToken
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.userProfileChangeRequest
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.tasks.await
@@ -59,10 +60,15 @@ class AuthUiClient(
         }
     }
 
-    suspend fun signUpWithEmailAndPassword(email: String, password: String): SignInResult {
+    suspend fun signUpWithEmailAndPassword(displayName: String, email: String, password: String): SignInResult {
         val tag = "Firebase sign up with email and password"
         return try {
             val user = auth.createUserWithEmailAndPassword(email, password).await().user
+            user?.updateProfile(
+                userProfileChangeRequest {
+                    this.displayName = displayName
+                }
+            )
             Log.d(tag, "createUserWithEmail:success")
             SignInResult(
                 data = user?.run {

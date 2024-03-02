@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -81,8 +83,14 @@ fun CalorieTrackerNavHost(
         }
 
         composable(route = Screen.SignIn.route) {
-            val viewModel = viewModel<SignInViewModel>()
-            val state by viewModel.state.collectAsState()
+            val viewModel = viewModel<SignInViewModel>(
+                factory = viewModelFactory {
+                    initializer {
+                        SignInViewModel(authUiClient = authUiClient)
+                    }
+                }
+            )
+            val signInState by viewModel.signInState.collectAsState()
 
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -99,13 +107,17 @@ fun CalorieTrackerNavHost(
             )
 
             SignInScreen(
-                state = state,
+                viewModel = viewModel,
+                signInState = signInState,
                 onBackClick = {
                     navController.navigateUp()
                 },
+                onSignUpClick = {
+                    navController.navigate(Screen.SignUp.route)
+                },
                 onSignInSuccessful = {
                     navController.navigate(Screen.DailyLog.route)
-                    viewModel.resetState()
+                    viewModel.resetSignInState()
                 },
                 onGoogleSignInClick = {
                     lifecycleScope.launch {
@@ -114,16 +126,6 @@ fun CalorieTrackerNavHost(
                             IntentSenderRequest.Builder(
                                 signInIntentSender ?: return@launch
                             ).build()
-                        )
-                    }
-                },
-                onEmailAndPasswordSignInClick = { email, password ->
-                    lifecycleScope.launch {
-                        viewModel.onSignInResult(
-                            authUiClient.signInWithEmailAndPassword(
-                                email,
-                                password
-                            )
                         )
                     }
                 },
