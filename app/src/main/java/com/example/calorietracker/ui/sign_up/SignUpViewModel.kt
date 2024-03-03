@@ -1,4 +1,4 @@
-package com.example.calorietracker.ui.sign_in
+package com.example.calorietracker.ui.sign_up
 
 import android.app.Activity
 import android.content.Context
@@ -16,51 +16,45 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
-
-    private val _uiState = MutableStateFlow(SignInUiState())
+class SignUpViewModel(val authUiClient: AuthUiClient) : ViewModel() {
+    private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState = _uiState.asStateFlow()
 
     fun updateUiState(
         newEmail: String = _uiState.value.email,
+        newUsername: String = _uiState.value.username,
         newPassword: String = _uiState.value.password,
+        newConfirmPassword: String = _uiState.value.confirmPassword,
         newEmailError: String? = _uiState.value.emailErrorMessage,
+        newUsernameError: String? = _uiState.value.usernameErrorMessage,
         newPasswordError: String? = _uiState.value.passwordErrorMessage,
+        newConfirmPasswordError: String? = _uiState.value.confirmPasswordErrorMessage,
         newNetworkConnection: Boolean = _uiState.value.hasNetworkConnection,
-        newEmailSignInError: Boolean = _uiState.value.emailSignInError
-    ) {
+        newEmailSignInError: Boolean = _uiState.value.emailSignInError,
+
+        ) {
         _uiState.update {
             it.copy(
                 email = newEmail,
+                username = newUsername,
                 password = newPassword,
+                confirmPassword = newConfirmPassword,
                 emailErrorMessage = newEmailError,
+                usernameErrorMessage = newUsernameError,
                 passwordErrorMessage = newPasswordError,
+                confirmPasswordErrorMessage = newConfirmPasswordError,
                 hasNetworkConnection = newNetworkConnection,
                 emailSignInError = newEmailSignInError
             )
         }
     }
 
-    fun onLoginClick(context: Context) {
-        if(Utility.isInternetAvailable(context).not()) {
-            updateUiState(newNetworkConnection = false)
-            return
-        }
-        if (validInput().not()) {
-            return
-        }
-        viewModelScope.launch {
-            onEmailSignInResult(
-                authUiClient.signInWithEmailAndPassword(
-                    _uiState.value.email.trim(),
-                    _uiState.value.password
-                )
-            )
-        }
-    }
 
-    fun onContinueWithGoogleClick(context: Context, launcher:  ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>) {
-        if(Utility.isInternetAvailable(context).not()) {
+    fun onContinueWithGoogleClick(
+        context: Context,
+        launcher: ManagedActivityResultLauncher<IntentSenderRequest, ActivityResult>
+    ) {
+        if (Utility.isInternetAvailable(context).not()) {
             updateUiState(newNetworkConnection = false)
             return
         }
@@ -74,18 +68,48 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
         }
     }
 
+    fun onSignUpClick(context: Context) {
+        if (Utility.isInternetAvailable(context).not()) {
+            updateUiState(newNetworkConnection = false)
+            return
+        }
+        if (validInput().not()) {
+            return
+        }
+        viewModelScope.launch {
+            onSignInResult(
+                authUiClient.signUpWithDisplayNameEmailAndPassword(
+                    displayName = _uiState.value.username.trim(),
+                    email = _uiState.value.email.trim(),
+                    password = _uiState.value.password
+                )
+            )
+        }
+    }
+
     private fun validInput(): Boolean {
         var passed = true
         if (_uiState.value.email.isEmpty()) {
             updateUiState(newEmailError = "Please enter your email address.")
             passed = false
-        }
-        else if(Patterns.EMAIL_ADDRESS.matcher(_uiState.value.email).matches().not()) {
+        } else if (Patterns.EMAIL_ADDRESS.matcher(_uiState.value.email).matches().not()) {
             updateUiState(newEmailError = "Please enter a valid email address.")
+            passed = false
+        }
+        if (_uiState.value.username.isEmpty()) {
+            updateUiState(newUsernameError = "Please enter your username.")
             passed = false
         }
         if (_uiState.value.password.isEmpty()) {
             updateUiState(newPasswordError = "Please enter your password.")
+            passed = false
+        }
+        else if(_uiState.value.password.length < 6) {
+            updateUiState(newPasswordError = "Password must be at least 6 characters.")
+            passed = false
+        }
+        if (_uiState.value.password != _uiState.value.confirmPassword) {
+            updateUiState(newConfirmPasswordError = "Passwords must match.")
             passed = false
         }
         return passed
@@ -100,15 +124,6 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
         }
     }
 
-    private fun onEmailSignInResult(result: SignInResult) {
-        _uiState.update {
-            it.copy(
-                isSignInSuccessful = result.data != null,
-                emailSignInError = result.data == null,
-            )
-        }
-    }
-
     fun googleSignInWithIntent(result: ActivityResult) {
         if (result.resultCode == Activity.RESULT_OK) {
             viewModelScope.launch {
@@ -117,12 +132,6 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
                 )
                 onSignInResult(signInResult)
             }
-        }
-    }
-
-    fun resetUiState() {
-        _uiState.update {
-            SignInUiState()
         }
     }
 

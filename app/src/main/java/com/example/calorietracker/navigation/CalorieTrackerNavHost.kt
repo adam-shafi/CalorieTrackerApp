@@ -1,13 +1,7 @@
 package com.example.calorietracker.navigation
 
-import android.app.Activity.RESULT_OK
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -23,10 +17,13 @@ import androidx.navigation.navArgument
 import com.example.calorietracker.ui.add_food.AddFoodScreen
 import com.example.calorietracker.ui.auth.AuthUiClient
 import com.example.calorietracker.ui.daily_log.DailyLogScreen
+import com.example.calorietracker.ui.forgot_password.ForgotPasswordScreen
+import com.example.calorietracker.ui.forgot_password.ForgotPasswordViewModel
 import com.example.calorietracker.ui.profile.ProfileScreen
 import com.example.calorietracker.ui.sign_in.SignInScreen
 import com.example.calorietracker.ui.sign_in.SignInViewModel
 import com.example.calorietracker.ui.sign_up.SignUpScreen
+import com.example.calorietracker.ui.sign_up.SignUpViewModel
 import com.example.calorietracker.ui.welcome.WelcomeScreen
 import kotlinx.coroutines.launch
 
@@ -37,6 +34,7 @@ sealed class Screen(
 
     data object Welcome : Screen("welcome")
     data object SignIn : Screen("sign_in")
+    data object ForgotPassword : Screen("forgot_password")
 
     data object SignUp : Screen("sign_up")
 
@@ -90,25 +88,8 @@ fun CalorieTrackerNavHost(
                     }
                 }
             )
-            val signInState by viewModel.signInState.collectAsState()
-
-            val launcher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.StartIntentSenderForResult(),
-                onResult = { result ->
-                    if (result.resultCode == RESULT_OK) {
-                        lifecycleScope.launch {
-                            val signInResult = authUiClient.googleSignInWithIntent(
-                                intent = result.data ?: return@launch
-                            )
-                            viewModel.onSignInResult(signInResult)
-                        }
-                    }
-                }
-            )
-
             SignInScreen(
                 viewModel = viewModel,
-                signInState = signInState,
                 onBackClick = {
                     navController.navigateUp()
                 },
@@ -116,50 +97,57 @@ fun CalorieTrackerNavHost(
                     navController.navigate(Screen.SignUp.route)
                 },
                 onSignInSuccessful = {
-                    navController.navigate(Screen.DailyLog.route)
-                    viewModel.resetSignInState()
-                },
-                onGoogleSignInClick = {
-                    lifecycleScope.launch {
-                        val signInIntentSender = authUiClient.googleSignIn()
-                        launcher.launch(
-                            IntentSenderRequest.Builder(
-                                signInIntentSender ?: return@launch
-                            ).build()
-                        )
+                    while (navController.currentBackStackEntry != null) {
+                        navController.popBackStack()
                     }
+                    navController.navigate(Screen.DailyLog.route)
+                    viewModel.resetUiState()
                 },
+                onForgotPasswordClick = {
+                    navController.navigate(Screen.ForgotPassword.route)
+                }
+            )
+        }
+
+        composable(route = Screen.ForgotPassword.route) {
+            val viewModel = viewModel<ForgotPasswordViewModel>(
+                factory = viewModelFactory {
+                    initializer {
+                        ForgotPasswordViewModel(authUiClient = authUiClient)
+                    }
+                }
+            )
+            ForgotPasswordScreen(
+                viewModel = viewModel,
+                onBackClick = {
+                    navController.navigateUp()
+                }
             )
         }
 
         composable(route = Screen.SignUp.route) {
+            val viewModel = viewModel<SignUpViewModel>(
+                factory = viewModelFactory {
+                    initializer {
+                        SignUpViewModel(authUiClient = authUiClient)
+                    }
+                }
+            )
             SignUpScreen(
-//                state = state,
-//                onGoogleSignInClick = {
-//                    lifecycleScope.launch {
-//                        val signInIntentSender = authUiClient.googleSignIn()
-//                        launcher.launch(
-//                            IntentSenderRequest.Builder(
-//                                signInIntentSender ?: return@launch
-//                            ).build()
-//                        )
-//                    }
-//                },
-//                onEmailAndPasswordSignInClick = { email, password ->
-//                    lifecycleScope.launch {
-//                        viewModel.onSignInResult(authUiClient.signInWithEmailAndPassword(email, password))
-//                    }
-//                },
-//                onEmailAndPasswordSignUpClick = { email, password ->
-//                    lifecycleScope.launch {
-//                        viewModel.onSignInResult(
-//                            authUiClient.signUpWithEmailAndPassword(
-//                                email,
-//                                password
-//                            )
-//                        )
-//                    }
-//                }
+                viewModel = viewModel,
+                onBackClick = {
+                    navController.navigateUp()
+                },
+                onSignInClick = {
+                    navController.navigate(Screen.SignIn.route)
+                },
+                onSignInSuccessful = {
+                    while (navController.currentBackStackEntry != null) {
+                        navController.popBackStack()
+                    }
+                    navController.navigate(Screen.DailyLog.route)
+//                    viewModel.resetUiState()
+                },
             )
         }
 
