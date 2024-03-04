@@ -4,16 +4,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.ui.theme.DescriptionGray
 
 @Composable
 fun VerticalText(
+    modifier: Modifier = Modifier,
     title: String,
     description: String,
 ) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TitleText(text = title)
@@ -27,13 +31,15 @@ fun VerticalText(
 @Composable
 fun VerticalText(
     title: String,
+    titleFont: TextUnit = 18.sp,
     description: String,
+
     color: Color
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TitleText(text = title)
+        Text(text = title, fontSize = titleFont)
         Text(
             text = description,
             color = color

@@ -94,6 +94,7 @@ fun CalorieTrackerNavHost(
                     navController.navigateUp()
                 },
                 onSignUpClick = {
+                    navController.popBackStack(Screen.Welcome.route, false)
                     navController.navigate(Screen.SignUp.route)
                 },
                 onSignInSuccessful = {
@@ -139,6 +140,7 @@ fun CalorieTrackerNavHost(
                     navController.navigateUp()
                 },
                 onSignInClick = {
+                    navController.popBackStack(Screen.Welcome.route, false)
                     navController.navigate(Screen.SignIn.route)
                 },
                 onSignInSuccessful = {
@@ -146,7 +148,6 @@ fun CalorieTrackerNavHost(
                         navController.popBackStack()
                     }
                     navController.navigate(Screen.DailyLog.route)
-//                    viewModel.resetUiState()
                 },
             )
         }

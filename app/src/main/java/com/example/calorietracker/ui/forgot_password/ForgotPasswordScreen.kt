@@ -63,7 +63,8 @@ fun ForgotPasswordScreen(
                         newEmailError = null
                     )
                 },
-                errorMessage = uiState.emailErrorMessage
+                errorMessage = uiState.emailErrorMessage,
+                leadingIcon = ImageVector.vectorResource(R.drawable.email),
             )
             Button(
                 modifier = Modifier.fillMaxWidth(),

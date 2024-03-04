@@ -117,6 +117,7 @@ fun SignInScreen(
                         newEmailError = null
                     )
                 },
+                leadingIcon = ImageVector.vectorResource(R.drawable.email),
                 errorMessage = uiState.emailErrorMessage
             )
             CustomOutlinedTextField(
@@ -130,8 +131,8 @@ fun SignInScreen(
                 },
                 passwordVisibilityEnabled = true,
                 errorMessage = uiState.passwordErrorMessage,
-
-                )
+                leadingIcon = ImageVector.vectorResource(R.drawable.password),
+            )
             Button(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = { viewModel.onLoginClick(context) }) {

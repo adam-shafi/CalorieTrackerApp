@@ -26,10 +26,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
 import com.example.calorietracker.ui.components.VerticalText
+import com.example.calorietracker.ui.daily_log.MacroColorsState
 import com.example.calorietracker.ui.daily_log.MealState
-import com.example.calorietracker.ui.theme.CarbRed
-import com.example.calorietracker.ui.theme.FatGreen
-import com.example.calorietracker.ui.theme.ProteinBlue
 import com.example.calorietracker.ui.theme.dimen_10dp
 import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
@@ -38,7 +36,8 @@ import kotlin.math.roundToInt
 @Composable
 fun MealCard(
     mealState: MealState,
-    onAddClick: (String) -> Unit
+    onAddClick: (String) -> Unit,
+    macroColorsState: MacroColorsState
 ) {
     Card(
         modifier = Modifier
@@ -56,17 +55,57 @@ fun MealCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = mealState.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "${mealState.calories.roundToInt()} cal")
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(dimen_10dp)
+//                ) {
+//                    Text(
+//                        text = "P ${mealState.protein.roundToInt()}g",
+//                        color = WildBlue
+//                    )
+//                    Text(
+//                        text = "F ${mealState.fat.roundToInt()}g",
+//                        color = ZestyGreen
+//                    )
+//                    Text(
+//                        text = "C ${mealState.carbs.roundToInt()}g",
+//                        color = FruityRed
+//                    )
+//                    Text(
+//                        text = "${mealState.calories.roundToInt()} cal",
+//                        color = BrandOrange
+//                    )
+//                }
+
+
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                VerticalText(title = "${mealState.protein.roundToInt()} g", description = stringResource(id = R.string.protein), color = ProteinBlue)
-                VerticalText(title = "${mealState.carbs.roundToInt()} g", description = stringResource(id = R.string.carbs), color = CarbRed)
-                VerticalText(title = "${mealState.fat.roundToInt()} g", description = stringResource(id = R.string.fat), color = FatGreen)
+                VerticalText(
+                    title = "${mealState.calories.roundToInt()}",
+                    description = "Calories",
+                    color = macroColorsState.calories
+                )
+                VerticalText(
+                    title = "${mealState.protein.roundToInt()}g",
+                    description = stringResource(id = R.string.protein),
+                    color = macroColorsState.protein
+                )
+
+                VerticalText(
+                    title = "${mealState.fat.roundToInt()}g",
+                    description = stringResource(id = R.string.fat),
+                    color = macroColorsState.fat
+                )
+                VerticalText(
+                    title = "${mealState.carbs.roundToInt()}g",
+                    description = stringResource(id = R.string.carbs),
+                    color = macroColorsState.carbs
+                )
+
             }
-            mealState.foods.forEach{ food ->
+            mealState.foods.forEach { food ->
                 MealItem(
                     food = food.name,
                     serving = "${food.servingAmount.roundToInt()} ${food.servingUnits}",
@@ -83,7 +122,7 @@ fun MealCard(
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    ){
+                    ) {
                         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
                         Text("Add")
                     }

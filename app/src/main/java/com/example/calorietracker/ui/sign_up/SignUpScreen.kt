@@ -115,6 +115,7 @@ fun SignUpScreen(
                         newEmailError = null
                     )
                 },
+                leadingIcon = ImageVector.vectorResource(R.drawable.email),
                 errorMessage = uiState.emailErrorMessage
             )
             CustomOutlinedTextField(
@@ -126,6 +127,7 @@ fun SignUpScreen(
                         newUsernameError = null
                     )
                 },
+                leadingIcon = ImageVector.vectorResource(R.drawable.username),
                 errorMessage = uiState.usernameErrorMessage
             )
             CustomOutlinedTextField(
@@ -137,6 +139,7 @@ fun SignUpScreen(
                         newPasswordError = null
                     )
                 },
+                leadingIcon = ImageVector.vectorResource(R.drawable.password),
                 passwordVisibilityEnabled = true,
                 errorMessage = uiState.passwordErrorMessage
             )
@@ -149,6 +152,7 @@ fun SignUpScreen(
                         newConfirmPasswordError = null
                     )
                 },
+                leadingIcon = ImageVector.vectorResource(R.drawable.password),
                 passwordVisibilityEnabled = true,
                 errorMessage = uiState.confirmPasswordErrorMessage
             )

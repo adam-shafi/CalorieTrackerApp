@@ -50,7 +50,7 @@ fun DatePickerBar(
     Surface(
         modifier = Modifier
             .fillMaxWidth(),
-        color = MaterialTheme.colorScheme.secondaryContainer
+//        color = MaterialTheme.colorScheme.secondaryContainer
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

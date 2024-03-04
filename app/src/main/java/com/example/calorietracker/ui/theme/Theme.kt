@@ -28,7 +28,9 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    onPrimary = Color.White
+    onPrimary = Color.White,
+    secondaryContainer = Color.White,
+    background = Color.LightGray
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -45,7 +47,7 @@ private val LightColorScheme = lightColorScheme(
 fun CalorieTrackerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -61,7 +63,7 @@ fun CalorieTrackerTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            window.statusBarColor = colorScheme.primary.toArgb()
+            window.statusBarColor = colorScheme.surface.toArgb()
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
         }
     }

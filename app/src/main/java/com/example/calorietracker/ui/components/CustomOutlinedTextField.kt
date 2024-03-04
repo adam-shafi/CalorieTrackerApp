@@ -23,17 +23,23 @@ fun CustomOutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit,
     passwordVisibilityEnabled: Boolean = false,
-    errorMessage: String? = null
+    errorMessage: String? = null,
+    leadingIcon: ImageVector? = null
 ) {
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     OutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         label = { Text(text = label) },
         value = value,
+        leadingIcon = {
+            leadingIcon?.let {
+                Icon(imageVector = leadingIcon, contentDescription = null)
+            }
+        },
         onValueChange = onValueChange,
-        visualTransformation = if(passwordVisible.not() && passwordVisibilityEnabled) PasswordVisualTransformation() else VisualTransformation.None,
+        visualTransformation = if (passwordVisible.not() && passwordVisibilityEnabled) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = {
-            if(passwordVisibilityEnabled) {
+            if (passwordVisibilityEnabled) {
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(
                         imageVector = if (passwordVisible) {
