@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
@@ -82,7 +81,6 @@ fun DailyLogScreen(
     val uiState by viewModel.uiState.collectAsState()
     val scrollCoroutine = rememberCoroutineScope()
     val pageState = rememberPagerState(initialPage = 150, pageCount = { 300 })
-    val lazyListState = rememberLazyListState()
     LaunchedEffect(pageState) {
         var previousPage = pageState.currentPage
         snapshotFlow { pageState.currentPage }.collect {
@@ -193,7 +191,6 @@ fun DailyLogScreen(
                 verticalAlignment = Alignment.Top
             ) {
                 LazyColumn(
-                    state = lazyListState,
                     verticalArrangement = Arrangement.Top
                 ) {
                     items(uiState.meals) { mealState ->

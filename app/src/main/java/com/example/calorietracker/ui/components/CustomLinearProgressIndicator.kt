@@ -5,6 +5,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import com.example.calorietracker.ui.theme.dimen_10dp
 
 
@@ -19,5 +20,6 @@ fun CustomLinearProgressIndicator(
             .height(dimen_10dp),
         progress = progress,
         color = color,
+        strokeCap = StrokeCap.Round
     )
 }

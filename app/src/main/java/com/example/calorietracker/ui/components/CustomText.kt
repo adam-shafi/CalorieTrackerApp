@@ -28,24 +28,6 @@ fun VerticalText(
     }
 }
 
-@Composable
-fun VerticalText(
-    title: String,
-    titleFont: TextUnit = 18.sp,
-    description: String,
-
-    color: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = title, fontSize = titleFont)
-        Text(
-            text = description,
-            color = color
-        )
-    }
-}
 
 @Composable
 fun TitleText(text: String) {

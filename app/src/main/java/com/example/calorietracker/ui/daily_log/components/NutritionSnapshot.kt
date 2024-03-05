@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -44,11 +45,11 @@ fun NutritionSnapshot(
         macroColorsState = macroColorsState,
         calorieFraction = "${uiState.totalCalories.foodEaten.roundToInt()} / ${uiState.totalCalories.budget.roundToInt()}",
         caloriePercent = calorieInfoState.percent,
-        proteinFraction = "${uiState.totalProtein.foodEaten.roundToInt()} / ${uiState.totalProtein.budget.roundToInt()}",
+        proteinFraction = "${uiState.totalProtein.foodEaten.roundToInt()} / ${uiState.totalProtein.budget.roundToInt()}g",
         proteinPercent = proteinInfoState.percent,
-        carbsFraction = "${uiState.totalCarbs.foodEaten.roundToInt()} / ${uiState.totalCarbs.budget.roundToInt()}",
+        carbsFraction = "${uiState.totalCarbs.foodEaten.roundToInt()} / ${uiState.totalCarbs.budget.roundToInt()}g",
         carbPercent = carbInfoState.percent,
-        fatFraction = "${uiState.totalFat.foodEaten.roundToInt()} / ${uiState.totalFat.budget.roundToInt()}",
+        fatFraction = "${uiState.totalFat.foodEaten.roundToInt()} / ${uiState.totalFat.budget.roundToInt()}g",
         fatPercent = fatInfoState.percent
     )
 }
@@ -89,13 +90,15 @@ fun NutritionSnapshot(
                 icon = ImageVector.vectorResource(R.drawable.calorie_16dp),
                 fraction = calorieFraction,
                 fontSize = fontSize,
+                title = "Calories",
                 updateFontSize = { fontSize = it },
             )
             NutritionInfo(
                 modifier = Modifier.weight(1f),
                 progress = proteinPercent,
                 color = macroColorsState.protein,
-                title = "P",
+                title = "Protein",
+                icon = ImageVector.vectorResource(R.drawable.protein_16dp),
                 fraction = proteinFraction,
                 fontSize = fontSize,
                 updateFontSize = { fontSize = it },
@@ -104,7 +107,8 @@ fun NutritionSnapshot(
                 modifier = Modifier.weight(1f),
                 progress = fatPercent,
                 color = macroColorsState.fat,
-                title = "F",
+                title = "Fat",
+                icon = ImageVector.vectorResource(R.drawable.fat_16dp),
                 fraction = fatFraction,
                 fontSize = fontSize,
                 updateFontSize = { fontSize = it },
@@ -113,7 +117,8 @@ fun NutritionSnapshot(
                 modifier = Modifier.weight(1f),
                 progress = carbPercent,
                 color = macroColorsState.carbs,
-                title = "C",
+                title = "Carbs",
+                icon = ImageVector.vectorResource(R.drawable.carbs_16dp),
                 fraction = carbsFraction,
                 fontSize = fontSize,
                 updateFontSize = { fontSize = it },
@@ -127,38 +132,27 @@ fun NutritionInfo(
     modifier: Modifier = Modifier,
     progress: Float,
     color: Color,
-    title: String? = null,
-    icon: ImageVector? = null,
+    title: String,
+    icon: ImageVector,
     fraction: String,
     fontSize: TextUnit,
     updateFontSize: (TextUnit) -> Unit,
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Row(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            icon?.let {
-                Icon(imageVector = icon, contentDescription = null)
-            }
-            title?.let {
-                Text(
-                    text = title,
-                    fontSize = fontSize,
-                    onTextLayout = { result ->
-                        fun constrain() {
-                            updateFontSize(fontSize * 0.9f)
-                        }
-                        if (result.hasVisualOverflow) {
-                            constrain()
-                        }
-                    }
-                )
-            }
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        )
+        {
+            Icon(imageVector = icon, contentDescription = null)
             Spacer(modifier = Modifier.width(4.dp))
             Text(
-                text = fraction,
+                text = title,
                 maxLines = 1,
                 fontSize = fontSize,
                 onTextLayout = { result ->
@@ -171,6 +165,23 @@ fun NutritionInfo(
                 }
             )
         }
+
+
+
+        Text(
+            text = fraction,
+            maxLines = 1,
+            fontSize = fontSize,
+            onTextLayout = { result ->
+                fun constrain() {
+                    updateFontSize(fontSize * 0.9f)
+                }
+                if (result.hasVisualOverflow) {
+                    constrain()
+                }
+            }
+        )
+
         CustomLinearProgressIndicator(
             progress = progress,
             color = color
