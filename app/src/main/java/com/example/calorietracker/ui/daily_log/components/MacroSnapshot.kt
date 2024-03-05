@@ -40,85 +40,85 @@ import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
 import kotlin.math.roundToInt
 
-@Composable
-fun MacroSnapshot(
-    uiState: DailyLogUiState,
-    calorieInfoState: DerivedMacroInfoState,
-    proteinInfoState: DerivedMacroInfoState,
-    carbInfoState: DerivedMacroInfoState,
-    fatInfoState: DerivedMacroInfoState
-) {
-    MacroSnapshot(
-        calorieBudget = uiState.totalCalories.budget.roundToInt(),
-        calorieEaten = uiState.totalCalories.foodEaten.roundToInt(),
-        calorieRemainder = calorieInfoState.remainder,
-        caloriePercent = calorieInfoState.percent,
-        isCalorieOver = calorieInfoState.isOver,
-        proteinEaten = uiState.totalProtein.foodEaten.roundToInt(),
-        proteinBudget = uiState.totalProtein.budget.roundToInt(),
-        proteinPercent = proteinInfoState.percent.roundToInt(),
-        carbsEaten = uiState.totalCarbs.foodEaten.roundToInt(),
-        carbsBudget = uiState.totalCarbs.budget.roundToInt(),
-        carbPercent = carbInfoState.percent.roundToInt(),
-        fatEaten = uiState.totalFat.foodEaten.roundToInt(),
-        fatBudget = uiState.totalFat.budget.roundToInt(),
-        fatPercent = fatInfoState.percent.roundToInt()
-    )
-}
+//@Composable
+//fun MacroSnapshot(
+//    uiState: DailyLogUiState,
+//    calorieInfoState: DerivedMacroInfoState,
+//    proteinInfoState: DerivedMacroInfoState,
+//    carbInfoState: DerivedMacroInfoState,
+//    fatInfoState: DerivedMacroInfoState
+//) {
+//    MacroSnapshot(
+//        calorieBudget = uiState.totalCalories.budget.roundToInt(),
+//        calorieEaten = uiState.totalCalories.foodEaten.roundToInt(),
+//        calorieRemainder = calorieInfoState.remainder,
+//        caloriePercent = calorieInfoState.percent,
+//        isCalorieOver = calorieInfoState.isOver,
+//        proteinEaten = uiState.totalProtein.foodEaten.roundToInt(),
+//        proteinBudget = uiState.totalProtein.budget.roundToInt(),
+//        proteinPercent = proteinInfoState.percent.roundToInt(),
+//        carbsEaten = uiState.totalCarbs.foodEaten.roundToInt(),
+//        carbsBudget = uiState.totalCarbs.budget.roundToInt(),
+//        carbPercent = carbInfoState.percent.roundToInt(),
+//        fatEaten = uiState.totalFat.foodEaten.roundToInt(),
+//        fatBudget = uiState.totalFat.budget.roundToInt(),
+//        fatPercent = fatInfoState.percent.roundToInt()
+//    )
+//}
 
-@Composable
-fun MacroSnapshot(
-    calorieBudget: Int,
-    calorieEaten: Int,
-    calorieRemainder: Float,
-    caloriePercent: Float,
-    isCalorieOver: Boolean,
-    proteinEaten: Int,
-    proteinBudget: Int,
-    proteinPercent: Int,
-    carbsEaten: Int,
-    carbsBudget: Int,
-    carbPercent: Int,
-    fatEaten: Int,
-    fatBudget: Int,
-    fatPercent: Int
-) {
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth(),
-        color = MaterialTheme.colorScheme.secondaryContainer
-    ) {
-        Column(
-            modifier = Modifier.padding(dimen_10dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            TitleText(text = "Calories")
-            CalorieInfo(
-                budget = calorieBudget,
-                remainder = calorieRemainder,
-                foodEaten = calorieEaten,
-                percent = caloriePercent,
-                isOver = isCalorieOver
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            TitleText(text = "Macros")
-            MacroInfo(
-                proteinBudget = proteinBudget,
-                proteinEaten = proteinEaten,
-                proteinPercent = proteinPercent,
-                carbsBudget = carbsBudget,
-                carbsEaten = carbsEaten,
-                carbPercent = carbPercent,
-                fatBudget = fatBudget,
-                fatEaten = fatEaten,
-                fatPercent = fatPercent
-            )
-        }
-
-
-    }
-}
+//@Composable
+//fun MacroSnapshot(
+//    calorieBudget: Int,
+//    calorieEaten: Int,
+//    calorieRemainder: Float,
+//    caloriePercent: Float,
+//    isCalorieOver: Boolean,
+//    proteinEaten: Int,
+//    proteinBudget: Int,
+//    proteinPercent: Int,
+//    carbsEaten: Int,
+//    carbsBudget: Int,
+//    carbPercent: Int,
+//    fatEaten: Int,
+//    fatBudget: Int,
+//    fatPercent: Int
+//) {
+//
+//    Surface(
+//        modifier = Modifier
+//            .fillMaxWidth(),
+//        color = MaterialTheme.colorScheme.secondaryContainer
+//    ) {
+//        Column(
+//            modifier = Modifier.padding(dimen_10dp),
+//            verticalArrangement = Arrangement.SpaceBetween
+//        ) {
+//            TitleText(text = "Calories")
+//            CalorieInfo(
+//                budget = calorieBudget,
+//                remainder = calorieRemainder,
+//                foodEaten = calorieEaten,
+//                percent = caloriePercent,
+//                isOver = isCalorieOver
+//            )
+//            Spacer(modifier = Modifier.height(4.dp))
+//            TitleText(text = "Macros")
+//            MacroInfo(
+//                proteinBudget = proteinBudget,
+//                proteinEaten = proteinEaten,
+//                proteinPercent = proteinPercent,
+//                carbsBudget = carbsBudget,
+//                carbsEaten = carbsEaten,
+//                carbPercent = carbPercent,
+//                fatBudget = fatBudget,
+//                fatEaten = fatEaten,
+//                fatPercent = fatPercent
+//            )
+//        }
+//
+//
+//    }
+//}
 
 @Composable
 fun CalorieInfo(
@@ -156,78 +156,78 @@ fun CalorieInfo(
     }
 }
 
-@Composable
-fun MacroInfo(
-    proteinEaten: Int,
-    proteinBudget: Int,
-    proteinPercent: Int,
-    carbsEaten: Int,
-    carbsBudget: Int,
-    carbPercent: Int,
-    fatEaten: Int,
-    fatBudget: Int,
-    fatPercent: Int
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        MacroElement(
-            title = stringResource(id = R.string.protein),
-            current = proteinEaten,
-            percent = proteinPercent,
-            total = proteinBudget,
-            color = ProteinBlue,
-            gradientColor = ProteinBlueGradient
-        )
-        MacroElement(
-            title = stringResource(id = R.string.carbs),
-            current = carbsEaten,
-            percent = carbPercent,
-            total = carbsBudget,
-            color = CarbRed,
-            gradientColor = CarbRedGradient
-        )
-        MacroElement(
-            title = stringResource(id = R.string.fat),
-            current = fatEaten,
-            percent = fatPercent,
-            total = fatBudget,
-            color = FatGreen,
-            gradientColor = FatGreenGradient
-        )
-    }
+//@Composable
+//fun MacroInfo(
+//    proteinEaten: Int,
+//    proteinBudget: Int,
+//    proteinPercent: Int,
+//    carbsEaten: Int,
+//    carbsBudget: Int,
+//    carbPercent: Int,
+//    fatEaten: Int,
+//    fatBudget: Int,
+//    fatPercent: Int
+//) {
+//    Row(
+//        modifier = Modifier.fillMaxWidth(),
+//        horizontalArrangement = Arrangement.SpaceBetween
+//    ) {
+//        MacroElement(
+//            title = stringResource(id = R.string.protein),
+//            current = proteinEaten,
+//            percent = proteinPercent,
+//            total = proteinBudget,
+//            color = ProteinBlue,
+//            gradientColor = ProteinBlueGradient
+//        )
+//        MacroElement(
+//            title = stringResource(id = R.string.carbs),
+//            current = carbsEaten,
+//            percent = carbPercent,
+//            total = carbsBudget,
+//            color = CarbRed,
+//            gradientColor = CarbRedGradient
+//        )
+//        MacroElement(
+//            title = stringResource(id = R.string.fat),
+//            current = fatEaten,
+//            percent = fatPercent,
+//            total = fatBudget,
+//            color = FatGreen,
+//            gradientColor = FatGreenGradient
+//        )
+//    }
+//
+//
+//}
 
 
-}
-
-
-@Composable
-fun RowScope.MacroElement(
-    title: String,
-    current: Int,
-    total: Int,
-    percent: Int,
-    color: Color,
-    gradientColor: Color
-) {
-    val modifier = Modifier
-        .weight(1f)
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            modifier = Modifier.padding(bottom = dimen_16dp),
-            text = title,
-            fontSize = 20.sp,
-            color = color
-        )
-        LinearProgressBar(
-            modifier = Modifier.padding(horizontal = dimen_8dp),
-            gradientColors = listOf(color, gradientColor),
-            indicatorNumber = percent
-        )
-        Text(text = "$current / $total g", fontSize = 14.sp)
-    }
-}
+//@Composable
+//fun RowScope.MacroElement(
+//    title: String,
+//    current: Int,
+//    total: Int,
+//    percent: Int,
+//    color: Color,
+//    gradientColor: Color
+//) {
+//    val modifier = Modifier
+//        .weight(1f)
+//    Column(
+//        modifier = modifier,
+//        horizontalAlignment = Alignment.CenterHorizontally
+//    ) {
+//        Text(
+//            modifier = Modifier.padding(bottom = dimen_16dp),
+//            text = title,
+//            fontSize = 20.sp,
+//            color = color
+//        )
+//        LinearProgressBar(
+//            modifier = Modifier.padding(horizontal = dimen_8dp),
+//            gradientColors = listOf(color, gradientColor),
+//            indicatorNumber = percent
+//        )
+//        Text(text = "$current / $total g", fontSize = 14.sp)
+//    }
+//}

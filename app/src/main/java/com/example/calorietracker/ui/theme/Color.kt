@@ -28,8 +28,8 @@ val BrandLightBlue = Color(0xFF31A7FF)
 val BrandDarkBlue = Color(0xFF113A54)
 
 val CaloriesDark = Color(0XFFF7A02D)
-val CarbRedDark = Color(0xFFFF4133)
-val FatGreenDark = Color(0xFF23E865)
+val CarbRedDark = Color(0xFFCF8374)
+val FatGreenDark = Color(0xFF98fa7d)
 val ProteinBlueDark = Color(0xFF42CCCC)
 
 val CaloriesLight = Color(0XFFB7410E)

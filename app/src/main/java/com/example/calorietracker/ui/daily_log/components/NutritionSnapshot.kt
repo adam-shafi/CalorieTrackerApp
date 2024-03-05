@@ -183,9 +183,11 @@ fun NutritionInfo(
         )
 
         CustomLinearProgressIndicator(
+            modifier = Modifier.padding(dimen_8dp),
             progress = progress,
             color = color
         )
     }
 
 }
+

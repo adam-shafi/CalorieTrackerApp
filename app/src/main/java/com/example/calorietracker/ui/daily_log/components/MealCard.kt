@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -29,6 +30,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
+import com.example.calorietracker.ui.components.Line
+import com.example.calorietracker.ui.components.MultiColoredLinearProgressBar
 import com.example.calorietracker.ui.daily_log.MacroColorsState
 import com.example.calorietracker.ui.daily_log.MealState
 import com.example.calorietracker.ui.theme.dimen_10dp
@@ -116,6 +119,14 @@ fun MealCard(
                 )
 
             }
+            MultiColoredLinearProgressBar(
+                modifier = Modifier.padding(dimen_8dp).height(10.dp),
+                lines = listOf(
+                    Line(progress = .4f, color = macroColorsState.protein),
+                    Line(progress = .4f, color = macroColorsState.fat),
+                    Line(progress = 0.2f, color = macroColorsState.carbs),
+                )
+            )
             mealState.foods.forEach { food ->
                 MealItem(
                     food = food.name,
