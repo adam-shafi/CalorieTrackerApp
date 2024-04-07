@@ -89,7 +89,7 @@ class SignUpViewModel(
             )
             onSignInResult(signInResult)
             signInResult.data?.let {
-                firestoreUseCase.addDocumentToFirestore(
+                firestoreUseCase.addDocument(
                     it.userId, hashMapOf(
                         "username" to (it.username ?: "username not found"),
                         "email" to (it.email ?: "email not found"),
@@ -145,7 +145,7 @@ class SignUpViewModel(
                 )
                 onSignInResult(signInResult)
                 signInResult.data?.let {
-                    firestoreUseCase.addDocumentToFirestore(
+                    firestoreUseCase.addDocument(
                         it.userId, hashMapOf(
                             "username" to (it.username ?: "username not found"),
                             "email" to (it.email ?: "email not found"),

@@ -8,7 +8,7 @@ import com.google.firebase.firestore.firestore
 class FirestoreUseCase {
     private val db = Firebase.firestore
 
-    fun addDocumentToFirestore(userId: String, data: HashMap<String, Any>) {
+    fun addDocument(userId: String, data: HashMap<String, Any>) {
         val usersRef = db.collection("users").document(userId)
         usersRef.get().addOnCompleteListener{ task ->
             if (task.isSuccessful) {
