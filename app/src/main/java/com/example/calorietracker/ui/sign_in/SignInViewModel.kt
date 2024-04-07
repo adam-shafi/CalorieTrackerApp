@@ -1,7 +1,9 @@
 package com.example.calorietracker.ui.sign_in
 
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.util.Log
 import android.util.Patterns
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.result.ActivityResult
@@ -11,6 +13,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.calorietracker.ui.auth.AuthUiClient
 import com.example.calorietracker.ui.auth.SignInResult
 import com.example.calorietracker.util.Utility
+import com.google.firebase.Firebase
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,6 +24,8 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignInUiState())
     val uiState = _uiState.asStateFlow()
+
+    private val db = Firebase.firestore
 
     fun updateUiState(
         newEmail: String = _uiState.value.email,
@@ -50,12 +56,18 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
             return
         }
         viewModelScope.launch {
-            onEmailSignInResult(
-                authUiClient.signInWithEmailAndPassword(
-                    _uiState.value.email.trim(),
-                    _uiState.value.password
-                )
+            val signInResult = authUiClient.signInWithEmailAndPassword(
+                _uiState.value.email.trim(),
+                _uiState.value.password
             )
+            updateOnEmailSignInResult(signInResult)
+            signInResult.data?.let {
+                addDocumentToFirestore(it.userId, hashMapOf(
+                    "username" to (it.username ?: "username not found"),
+                    "email" to (it.email ?: "email not found"),
+                    "profile_picture_url" to (it.profilePictureUrl ?: "profile picture not found")
+                ))
+            }
         }
     }
 
@@ -71,6 +83,25 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
                     signInIntentSender ?: return@launch
                 ).build()
             )
+        }
+    }
+
+    private fun addDocumentToFirestore(userId: String, data: HashMap<String, Any>) {
+        val usersRef = db.collection("users").document(userId)
+        usersRef.get().addOnCompleteListener{ task ->
+            if (task.isSuccessful) {
+                val document = task.result
+                if(document.exists().not()) {
+                    usersRef.set(data)
+                    Log.d(TAG, "Document added")
+                }
+                else {
+                   Log.d(TAG, "Document already exists")
+                }
+            }
+            else {
+                Log.w(TAG, "Error adding document", task.exception)
+            }
         }
     }
 
@@ -100,7 +131,7 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
         }
     }
 
-    private fun onEmailSignInResult(result: SignInResult) {
+    private fun updateOnEmailSignInResult(result: SignInResult) {
         _uiState.update {
             it.copy(
                 isSignInSuccessful = result.data != null,
@@ -116,6 +147,13 @@ class SignInViewModel(private val authUiClient: AuthUiClient) : ViewModel() {
                     intent = result.data ?: return@launch
                 )
                 onSignInResult(signInResult)
+                signInResult.data?.let {
+                    addDocumentToFirestore(it.userId, hashMapOf(
+                        "username" to (it.username ?: "username not found"),
+                        "email" to (it.email ?: "email not found"),
+                        "profile_picture_url" to (it.profilePictureUrl ?: "profile picture not found")
+                    ))
+                }
             }
         }
     }
