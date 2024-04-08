@@ -18,7 +18,7 @@ class AddFoodViewModel @Inject constructor(
     private val repository: DailyLogRepository,
 ) : ViewModel() {
     val mealName: String = savedStateHandle.get<String>("mealName")!!
-    private val dateId: String = savedStateHandle.get<String>("dateId")!!
+    val dateId: String = savedStateHandle.get<String>("dateId")!!
     private val _uiState = MutableStateFlow(AddFoodUiState())
     val uiState = _uiState.asStateFlow()
     init {

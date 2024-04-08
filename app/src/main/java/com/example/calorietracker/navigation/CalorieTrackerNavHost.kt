@@ -16,6 +16,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.calorietracker.ui.add_food.AddFoodScreen
 import com.example.calorietracker.ui.auth.AuthUiClient
+import com.example.calorietracker.ui.create_food.CreateFoodScreen
+import com.example.calorietracker.ui.create_food.CreateFoodViewModel
 import com.example.calorietracker.ui.daily_log.DailyLogScreen
 import com.example.calorietracker.ui.forgot_password.ForgotPasswordScreen
 import com.example.calorietracker.ui.forgot_password.ForgotPasswordViewModel
@@ -53,6 +55,20 @@ sealed class Screen(
         )
     ) {
         fun createRoute(mealName: String, dateId: String) = "add_food/${mealName}-${dateId}"
+    }
+
+    data object CreateFood : Screen(
+        route = "create_food/{mealName}-{dateId}",
+        navArguments = listOf(
+            navArgument("mealName") {
+                type = NavType.StringType
+            },
+            navArgument("dateId") {
+                type = NavType.StringType
+            },
+        )
+    ) {
+        fun createRoute(mealName: String, dateId: String) = "create_food/${mealName}-${dateId}"
     }
 }
 
@@ -188,6 +204,22 @@ fun CalorieTrackerNavHost(
             arguments = Screen.AddFood.navArguments
         ) {
             AddFoodScreen(
+                onBackClick = { navController.navigateUp() },
+                onCreateFoodClick = { mealName, dateId ->
+                    navController.navigate(
+                        Screen.CreateFood.createRoute(mealName = mealName, dateId = dateId)
+                    )
+                }
+            )
+        }
+
+        composable(
+            route = Screen.CreateFood.route,
+            arguments = Screen.CreateFood.navArguments
+        ) {
+            val viewModel = viewModel<CreateFoodViewModel>()
+            CreateFoodScreen(
+                viewModel = viewModel,
                 onBackClick = { navController.navigateUp() }
             )
         }

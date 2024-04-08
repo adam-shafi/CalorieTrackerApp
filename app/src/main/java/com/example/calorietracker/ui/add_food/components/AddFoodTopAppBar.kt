@@ -33,7 +33,8 @@ fun AddFoodTopAppBar(
     onBackClick: () -> Unit,
     mealNames: List<String>,
     selectedMealName: String,
-    updateSelectedMealName: (String) -> Unit
+    updateSelectedMealName: (String) -> Unit,
+    onCreateFoodClick: () -> Unit,
 
 ) {
     var isMealSelectOpen by rememberSaveable { mutableStateOf(false) }
@@ -83,7 +84,7 @@ fun AddFoodTopAppBar(
             }
         },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = onCreateFoodClick ) {
                 Icon(
                     imageVector = ImageVector.vectorResource(R.drawable.create_food),
                     contentDescription = "Create Food"

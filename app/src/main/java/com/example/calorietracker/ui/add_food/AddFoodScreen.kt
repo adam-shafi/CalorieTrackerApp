@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 fun AddFoodScreen(
     viewModel: AddFoodViewModel = hiltViewModel(),
     onBackClick: () -> Unit,
+    onCreateFoodClick: (String, String) -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchText by rememberSaveable { mutableStateOf("") }
@@ -52,7 +53,8 @@ fun AddFoodScreen(
                 onBackClick = onBackClick,
                 mealNames = uiState.mealNames,
                 selectedMealName = uiState.selectedMealName,
-                updateSelectedMealName = viewModel::updateSelectedMealName
+                updateSelectedMealName = viewModel::updateSelectedMealName,
+                onCreateFoodClick = { onCreateFoodClick(viewModel.mealName, viewModel.dateId) }
             )
         },
         floatingActionButton = {
