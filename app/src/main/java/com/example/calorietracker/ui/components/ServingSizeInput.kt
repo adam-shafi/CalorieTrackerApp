@@ -16,6 +16,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -32,10 +36,9 @@ fun ServingSizeInput(
     amountPlaceholder: String? = null,
     dropdownText: String,
     onDropdownTextChange: (String) -> Unit,
-    isDropdownExpanded: Boolean,
-    updateDropdown: (Boolean) -> Unit,
     dropdownItems: List<String>
 ) {
+    var isDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     Row(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -59,7 +62,7 @@ fun ServingSizeInput(
             modifier = Modifier
                 .weight(1f)
                 .height(55.dp),
-            onClick = { updateDropdown(true) },
+            onClick = { isDropdownExpanded = true },
             shape = RoundedCornerShape(10)
         ) {
             Row(
@@ -76,12 +79,12 @@ fun ServingSizeInput(
             }
             DropdownMenu(
                 expanded = isDropdownExpanded,
-                onDismissRequest = { updateDropdown(false) }) {
+                onDismissRequest = { isDropdownExpanded = false }) {
                 dropdownItems.forEach {
                     DropdownMenuItem(text = { Text(text = it) },
                         onClick = {
                             onDropdownTextChange(it)
-                            updateDropdown(false)
+                            isDropdownExpanded = false
                         }
                     )
                 }

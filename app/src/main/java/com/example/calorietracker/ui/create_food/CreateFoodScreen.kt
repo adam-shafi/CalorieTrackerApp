@@ -21,10 +21,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,8 +41,6 @@ fun CreateFoodScreen(
     onBackClick: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsState().value
-    var isServingTypeDropdownExpanded by rememberSaveable { mutableStateOf(false) }
-    var isServingAmountDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -135,8 +129,6 @@ fun CreateFoodScreen(
                     amountPlaceholder = "1",
                     dropdownText = uiState.servingTypeUnits,
                     onDropdownTextChange = viewModel::updateServingTypeUnits,
-                    isDropdownExpanded = isServingTypeDropdownExpanded,
-                    updateDropdown = { isServingTypeDropdownExpanded = it },
                     dropdownItems = listOf(
                         "serving",
                         "can"
@@ -150,8 +142,6 @@ fun CreateFoodScreen(
                     amountPlaceholder = "(optional)",
                     dropdownText = uiState.servingAmountUnits,
                     onDropdownTextChange = viewModel::updateServingAmountUnits,
-                    isDropdownExpanded = isServingAmountDropdownExpanded,
-                    updateDropdown = { isServingAmountDropdownExpanded = it },
                     dropdownItems = listOf(
                         "grams",
                         "ounces",
