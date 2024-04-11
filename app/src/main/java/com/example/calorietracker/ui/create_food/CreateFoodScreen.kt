@@ -115,7 +115,7 @@ fun CreateFoodScreen(
             item {
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Brand Name") },
+                    label = { Text("Brand Name (Optional)") },
                     value = uiState.brandName,
                     onValueChange = viewModel::updateBrandName,
                     keyboardOptions = KeyboardOptions.Default.copy(
@@ -147,6 +147,7 @@ fun CreateFoodScreen(
                 ServingSizeInput(
                     amount = uiState.servingAmount,
                     onAmountChange = viewModel::updateServingAmount,
+                    amountPlaceholder = "(optional)",
                     dropdownText = uiState.servingAmountUnits,
                     onDropdownTextChange = viewModel::updateServingAmountUnits,
                     isDropdownExpanded = isServingAmountDropdownExpanded,
