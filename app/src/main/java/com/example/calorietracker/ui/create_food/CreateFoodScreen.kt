@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,8 +45,8 @@ fun CreateFoodScreen(
     onBackClick: () -> Unit,
 ) {
     val uiState = viewModel.uiState.collectAsState().value
-    var isServingTypeDropdownExpanded by remember { mutableStateOf(false) }
-    var isServingAmountDropdownExpanded by remember { mutableStateOf(false) }
+    var isServingTypeDropdownExpanded by rememberSaveable { mutableStateOf(false) }
+    var isServingAmountDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     Scaffold(
         topBar = {
             TopAppBar(
