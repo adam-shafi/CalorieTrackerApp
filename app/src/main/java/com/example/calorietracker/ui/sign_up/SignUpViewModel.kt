@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 class SignUpViewModel(
     val authUiClient: AuthUiClient,
-    val firestoreUseCase: FirestoreUseCase = FirestoreUseCase()
+    private val firestoreUseCase: FirestoreUseCase = FirestoreUseCase()
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SignUpUiState())
     val uiState = _uiState.asStateFlow()
@@ -89,7 +89,7 @@ class SignUpViewModel(
             )
             onSignInResult(signInResult)
             signInResult.data?.let {
-                firestoreUseCase.addDocument(
+                firestoreUseCase.addUserDocument(
                     it.userId, hashMapOf(
                         "username" to (it.username ?: "username not found"),
                         "email" to (it.email ?: "email not found"),
@@ -145,7 +145,7 @@ class SignUpViewModel(
                 )
                 onSignInResult(signInResult)
                 signInResult.data?.let {
-                    firestoreUseCase.addDocument(
+                    firestoreUseCase.addUserDocument(
                         it.userId, hashMapOf(
                             "username" to (it.username ?: "username not found"),
                             "email" to (it.email ?: "email not found"),

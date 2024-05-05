@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -21,6 +22,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,7 @@ import com.example.calorietracker.R
 import com.example.calorietracker.ui.components.NutritionFactsTextField
 import com.example.calorietracker.ui.components.ServingSizeInput
 import com.example.calorietracker.ui.theme.dimen_8dp
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,6 +43,8 @@ fun CreateFoodScreen(
     viewModel: CreateFoodViewModel,
     onBackClick: () -> Unit,
 ) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     val uiState = viewModel.uiState.collectAsState().value
     Scaffold(
         topBar = {
@@ -60,7 +65,25 @@ fun CreateFoodScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onBackClick) {
+                    IconButton(
+                        onClick = {
+                            if (viewModel.onSaveClick()) {
+                                onBackClick()
+                            }
+                            else {
+                                coroutineScope.launch {
+                                    if(uiState.foodNameError != null) {
+                                        listState.scrollToItem(index = 1)
+                                    }
+                                    else if (uiState.caloriesError) {
+                                        listState.scrollToItem(index = 7)
+                                    }
+                                }
+
+                            }
+
+                        }
+                    ) {
                         Icon(imageVector = Icons.Filled.Check, contentDescription = null)
                     }
                 },
@@ -78,6 +101,7 @@ fun CreateFoodScreen(
                 .padding(paddingValues)
                 .padding(dimen_8dp)
                 .fillMaxWidth(),
+            state = listState,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
 
@@ -102,7 +126,13 @@ fun CreateFoodScreen(
                     onValueChange = viewModel::updateFoodName,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         imeAction = ImeAction.Next
-                    )
+                    ),
+                    isError = uiState.foodNameError != null,
+                    supportingText = {
+                        uiState.foodNameError?.let {
+                            Text(it)
+                        }
+                    }
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
@@ -132,7 +162,8 @@ fun CreateFoodScreen(
                     dropdownItems = listOf(
                         "serving",
                         "can"
-                    )
+                    ),
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
@@ -147,7 +178,8 @@ fun CreateFoodScreen(
                         "ounces",
                         "cups",
                         "milliliters",
-                    )
+                    ),
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
@@ -158,14 +190,17 @@ fun CreateFoodScreen(
                     title = "Calories",
                     placeholder = "Required",
                     text = uiState.calories,
-                    onValueChange = viewModel::updateCalories
+                    onValueChange = viewModel::updateCalories,
+                    isError = uiState.caloriesError,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
                 NutritionFactsTextField(
                     title = "Total Fat (g)",
                     text = uiState.totalFat,
-                    onValueChange = viewModel::updateTotalFat
+                    onValueChange = viewModel::updateTotalFat,
+                    formatInput = viewModel::formatInput
                 )
 
             }
@@ -174,7 +209,8 @@ fun CreateFoodScreen(
                     title = "Saturated Fat (g)",
                     text = uiState.saturatedFat,
                     onValueChange = viewModel::updateSaturatedFat,
-                    tabs = 1
+                    tabs = 1,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
@@ -182,28 +218,32 @@ fun CreateFoodScreen(
                     title = "Trans Fat (g)",
                     text = uiState.transFat,
                     onValueChange = viewModel::updateTransFat,
-                    tabs = 1
+                    tabs = 1,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
                 NutritionFactsTextField(
                     title = "Cholesterol (mg)",
                     text = uiState.cholesterol,
-                    onValueChange = viewModel::updateCholesterol
+                    onValueChange = viewModel::updateCholesterol,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
                 NutritionFactsTextField(
                     title = "Sodium (mg)",
                     text = uiState.sodium,
-                    onValueChange = viewModel::updateSodium
+                    onValueChange = viewModel::updateSodium,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
                 NutritionFactsTextField(
                     title = "Total Carbohydrate (g)",
                     text = uiState.totalCarbohydrate,
-                    onValueChange = viewModel::updateTotalCarbohydrate
+                    onValueChange = viewModel::updateTotalCarbohydrate,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
@@ -211,7 +251,8 @@ fun CreateFoodScreen(
                     title = "Dietary Fiber (g)",
                     text = uiState.dietaryFiber,
                     onValueChange = viewModel::updateDietaryFiber,
-                    tabs = 1
+                    tabs = 1,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
@@ -219,7 +260,8 @@ fun CreateFoodScreen(
                     title = "Total Sugars (g)",
                     text = uiState.totalSugars,
                     onValueChange = viewModel::updateTotalSugars,
-                    tabs = 1
+                    tabs = 1,
+                    formatInput = viewModel::formatInput
                 )
             }
             item {
@@ -227,7 +269,8 @@ fun CreateFoodScreen(
                     title = "Protein (g)",
                     text = uiState.protein,
                     onValueChange = viewModel::updateProtein,
-                    isLast = true
+                    isLast = true,
+                    formatInput = viewModel::formatInput
                 )
             }
         }

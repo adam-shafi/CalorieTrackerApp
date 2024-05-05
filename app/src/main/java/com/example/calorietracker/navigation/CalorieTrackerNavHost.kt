@@ -217,7 +217,14 @@ fun CalorieTrackerNavHost(
             route = Screen.CreateFood.route,
             arguments = Screen.CreateFood.navArguments
         ) {
-            val viewModel = viewModel<CreateFoodViewModel>()
+            val viewModel = viewModel<CreateFoodViewModel>(
+                factory = viewModelFactory {
+                    initializer {
+                        CreateFoodViewModel()
+                    }
+                }
+            )
+//            val viewModel = viewModel<CreateFoodViewModel>()
             CreateFoodScreen(
                 viewModel = viewModel,
                 onBackClick = { navController.navigateUp() }

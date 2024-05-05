@@ -1,5 +1,7 @@
 package com.example.calorietracker.ui.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +12,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
@@ -25,8 +30,18 @@ fun NutritionFactsTextField(
     text: String,
     onValueChange: (String) -> Unit,
     tabs: Int = 0,
-    isLast: Boolean = false
+    isLast: Boolean = false,
+    isError: Boolean = false,
+    formatInput: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    LaunchedEffect(key1 = isFocused) {
+        if(isFocused.not()) {
+            formatInput()
+        }
+    }
     Column {
         Row(Modifier.fillMaxWidth()) {
             TextField(
@@ -46,7 +61,8 @@ fun NutritionFactsTextField(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         text = placeholder,
-                        textAlign = TextAlign.End
+                        textAlign = TextAlign.End,
+                        color = if(isError) Color.Red else Color.Unspecified
                     )
                 },
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -60,7 +76,9 @@ fun NutritionFactsTextField(
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedContainerColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
-                )
+                ),
+                isError = isError,
+                interactionSource = interactionSource
             )
         }
         if (isLast.not()) {

@@ -1,5 +1,7 @@
 package com.example.calorietracker.ui.components
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,8 +18,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -36,9 +40,18 @@ fun ServingSizeInput(
     amountPlaceholder: String? = null,
     dropdownText: String,
     onDropdownTextChange: (String) -> Unit,
-    dropdownItems: List<String>
+    dropdownItems: List<String>,
+    formatInput: () -> Unit
 ) {
     var isDropdownExpanded by rememberSaveable { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val isFocused by interactionSource.collectIsFocusedAsState()
+
+    LaunchedEffect(key1 = isFocused) {
+        if(isFocused.not()) {
+            formatInput()
+        }
+    }
     Row(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
@@ -56,7 +69,8 @@ fun ServingSizeInput(
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
-            )
+            ),
+            interactionSource = interactionSource
         )
         OutlinedButton(
             modifier = Modifier
