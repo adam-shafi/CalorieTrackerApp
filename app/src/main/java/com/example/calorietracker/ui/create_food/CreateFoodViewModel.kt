@@ -1,21 +1,38 @@
 package com.example.calorietracker.ui.create_food
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import com.example.calorietracker.data.ServingAmount
 import com.example.calorietracker.firestore.FirestoreUseCase
+import com.example.calorietracker.values.ServingSizes
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+
+data class ServingAmountUiState(
+    val amount: String = "",
+    val units: Int = 0,
+    val dropdownText: String = "",
+)
 
 
 data class CreateFoodUiState(
     val foodName: String = "",
     val brandName: String = "",
-    val servingType: String = "",
-    val servingTypeUnits: String = "serving",
-    val servingAmount: String = "",
-    val servingAmountUnits: String = "grams",
+    val servingAmounts: List<ServingAmountUiState> = listOf(
+        ServingAmountUiState(
+            dropdownText = ServingSizes.servingAmountSingular[0],
+        )
+    ),
+    val servingWeight: ServingAmountUiState = ServingAmountUiState(
+        dropdownText = ServingSizes.servingWeightUnitsPlural[0],
+    ),
+    val servingVolume: ServingAmountUiState = ServingAmountUiState(
+        dropdownText = ServingSizes.servingVolumeUnitsPlural[0],
+    ),
     val calories: String = "",
     val totalFat: String = "",
     val saturatedFat: String = "",
@@ -28,14 +45,90 @@ data class CreateFoodUiState(
     val protein: String = "",
     val foodNameError: String? = null,
     val caloriesError: Boolean = false,
+    val servingsError: Boolean = false,
 )
 
 class CreateFoodViewModel(
-    private val firestoreUseCase: FirestoreUseCase = FirestoreUseCase()
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-
+    private val firestoreUseCase: FirestoreUseCase = FirestoreUseCase()
     private val _uiState = MutableStateFlow(CreateFoodUiState())
     val uiState = _uiState.asStateFlow()
+
+
+    fun addServingAmount() {
+        _uiState.update { createFoodUiState ->
+
+            var minUnused = 0
+            createFoodUiState.servingAmounts.sortedBy {
+                it.units
+            }.forEach {
+                if (it.units == minUnused) {
+                    minUnused += 1
+                }
+            }
+
+            val updatedServingAmounts = createFoodUiState.servingAmounts.toMutableList()
+            updatedServingAmounts.add(
+                ServingAmountUiState(
+                    units = minUnused,
+                    dropdownText = ServingSizes.servingAmountSingular[minUnused],
+                )
+            )
+            createFoodUiState.copy(
+                servingAmounts = updatedServingAmounts
+            )
+        }
+    }
+
+    fun getServingAmountDropdownItems(index: Int): List<String> {
+        val isSingular =
+            _uiState.value.servingAmounts[index].amount == "1" || _uiState.value.servingAmounts[index].amount.isEmpty()
+        val dropdownItems: MutableList<String> = if (isSingular) {
+            ServingSizes.servingAmountSingular.toMutableList()
+        } else {
+            ServingSizes.servingAmountPlural.toMutableList()
+        }
+        _uiState.value.servingAmounts.forEachIndexed { i, servingAmount ->
+            if (i != index) {
+                var text = servingAmount.dropdownText
+                if (isSingular.not() && text.endsWith("s").not()) {
+                    text += "s"
+                } else if (isSingular && text.endsWith("s")) {
+                    text = text.dropLast(1)
+                }
+                dropdownItems.remove(text)
+            }
+        }
+        return dropdownItems
+    }
+
+    fun getServingWeightDropdownItems(): List<String> {
+        val isSingular = _uiState.value.servingWeight.amount == "1"
+        return if (isSingular) ServingSizes.servingWeightUnitsSingular else ServingSizes.servingWeightUnitsPlural
+    }
+
+    fun getServingVolumeDropdownItems(): List<String> {
+        val isSingular = _uiState.value.servingVolume.amount == "1"
+        return if (isSingular) ServingSizes.servingVolumeUnitsSingular else ServingSizes.servingVolumeUnitsPlural
+    }
+
+    fun deleteServingAmount(index: Int) {
+        _uiState.update {
+            val updatedServingAmounts = it.servingAmounts.toMutableList()
+            updatedServingAmounts.removeAt(index)
+            if (updatedServingAmounts.isEmpty()) {
+                it.copy(
+                    servingsError = true
+                )
+            } else {
+                it.copy(
+                    servingAmounts = updatedServingAmounts
+                )
+            }
+
+        }
+    }
 
     fun updateFoodName(update: String) {
         _uiState.update {
@@ -54,34 +147,70 @@ class CreateFoodViewModel(
         }
     }
 
-    fun updateServingType(update: String) {
+    fun updateServingWeight(
+        amount: String = _uiState.value.servingWeight.amount,
+        unitsString: String = _uiState.value.servingWeight.dropdownText
+    ) {
         _uiState.update {
+            val updatedAmount = validateNumber(amount)
+            val units = if (unitsString.endsWith("s")) {
+                ServingSizes.servingWeightUnitsPlural.indexOf(unitsString)
+            } else {
+                ServingSizes.servingWeightUnitsSingular.indexOf(unitsString)
+            }
             it.copy(
-                servingType = validateNumber(update)
+                servingWeight = ServingAmountUiState(
+                    amount = updatedAmount,
+                    units = units,
+                    dropdownText = if (updatedAmount == "1") ServingSizes.servingWeightUnitsSingular[units] else ServingSizes.servingWeightUnitsPlural[units],
+                )
             )
         }
     }
 
-    fun updateServingTypeUnits(update: String) {
+    fun updateServingVolume(
+        amount: String = _uiState.value.servingVolume.amount,
+        unitsString: String = _uiState.value.servingVolume.dropdownText
+    ) {
         _uiState.update {
+            val updatedAmount = validateNumber(amount)
+            val units = if (unitsString.endsWith("s")) {
+                ServingSizes.servingVolumeUnitsPlural.indexOf(unitsString)
+            } else {
+                ServingSizes.servingVolumeUnitsSingular.indexOf(unitsString)
+            }
             it.copy(
-                servingTypeUnits = update
+                servingVolume = ServingAmountUiState(
+                    amount = updatedAmount,
+                    units = units,
+                    dropdownText = if (updatedAmount == "1") ServingSizes.servingVolumeUnitsSingular[units] else ServingSizes.servingVolumeUnitsPlural[units],
+                )
             )
         }
     }
 
-    fun updateServingAmount(update: String) {
+    fun updateServingAmounts(
+        index: Int,
+        amount: String = _uiState.value.servingAmounts[index].amount,
+        unitsString: String = _uiState.value.servingAmounts[index].dropdownText
+    ) {
         _uiState.update {
+            val updatedServingAmounts = it.servingAmounts.toMutableList()
+            val updatedAmount = validateNumber(amount)
+            val units = if (unitsString.endsWith("s")) {
+                ServingSizes.servingAmountPlural.indexOf(unitsString)
+            } else {
+                ServingSizes.servingAmountSingular.indexOf(unitsString)
+            }
+            updatedServingAmounts[index] =
+                ServingAmountUiState(
+                    amount = updatedAmount,
+                    units = units,
+                    dropdownText = if (updatedAmount == "1" || updatedAmount.isEmpty()) ServingSizes.servingAmountSingular[units] else ServingSizes.servingAmountPlural[units],
+                )
             it.copy(
-                servingAmount = validateNumber(update)
-            )
-        }
-    }
-
-    fun updateServingAmountUnits(update: String) {
-        _uiState.update {
-            it.copy(
-                servingAmountUnits = update
+                servingAmounts = updatedServingAmounts,
+                servingsError = false
             )
         }
     }
@@ -169,9 +298,25 @@ class CreateFoodViewModel(
 
     fun formatInput() {
         _uiState.update {
+            val formattedServingAmounts = it.servingAmounts.map { servingAmount ->
+                ServingAmountUiState(
+                    amount = formatNumber(servingAmount.amount),
+                    units = servingAmount.units,
+                    dropdownText = servingAmount.dropdownText,
+                )
+            }.toMutableList()
             it.copy(
-                servingType = formatNumber(it.servingType),
-                servingAmount = formatNumber(it.servingAmount),
+                servingWeight = ServingAmountUiState(
+                    amount = formatNumber(it.servingWeight.amount),
+                    units = it.servingWeight.units,
+                    dropdownText = it.servingWeight.dropdownText,
+                ),
+                servingVolume = ServingAmountUiState(
+                    amount = formatNumber(it.servingVolume.amount),
+                    units = it.servingVolume.units,
+                    dropdownText = it.servingVolume.dropdownText,
+                ),
+                servingAmounts = formattedServingAmounts,
                 calories = formatNumber(it.calories),
                 totalFat = formatNumber(it.totalFat),
                 saturatedFat = formatNumber(it.saturatedFat),
@@ -186,21 +331,21 @@ class CreateFoodViewModel(
         }
     }
 
-    fun formatNumber(value: String) : String {
+    private fun formatNumber(value: String): String {
         var formatted = value.trim()
-        if(formatted.isEmpty()){
+        if (formatted.isEmpty()) {
             return formatted
         }
-        if(formatted.first() == '.') {
+        if (formatted.first() == '.') {
             formatted = "0$formatted"
         }
-        if(formatted.last() == '.') {
+        if (formatted.last() == '.') {
             formatted = "${formatted}00"
         }
         return formatted
     }
 
-    fun validateNumber(update: String) : String {
+    private fun validateNumber(update: String): String {
         return when {
             update.isEmpty() -> {
                 update
@@ -211,7 +356,7 @@ class CreateFoodViewModel(
             }
 
             update.last() == '.' -> {
-                if(update.dropLast(1).contains('.')) {
+                if (update.dropLast(1).contains('.')) {
                     update.dropLast(1)
                 } else {
                     update
@@ -224,7 +369,7 @@ class CreateFoodViewModel(
         }
     }
 
-    fun updateFoodNameError(newError: String?) {
+    private fun updateFoodNameError(newError: String?) {
         _uiState.update {
             it.copy(
                 foodNameError = newError
@@ -232,7 +377,7 @@ class CreateFoodViewModel(
         }
     }
 
-    fun updateCaloriesError(newError: Boolean) {
+    private fun updateCaloriesError(newError: Boolean) {
         _uiState.update {
             it.copy(
                 caloriesError = newError
@@ -253,21 +398,52 @@ class CreateFoodViewModel(
         return passed
     }
 
-    fun onSaveClick(): Boolean {
+    private fun formatServingAmounts(): List<ServingAmount> {
+        val filteredServingAmounts = _uiState.value.servingAmounts.filter { it.amount.isNotBlank() }
+
+        return if (filteredServingAmounts.isEmpty()) {
+            listOf(
+                ServingAmount(
+                    amount = 1f,
+                    units = _uiState.value.servingAmounts[0].units
+                )
+            )
+        } else {
+            filteredServingAmounts.map {
+                ServingAmount(
+                    amount = it.amount.toFloat(),
+                    units = it.units
+                )
+            }
+        }
+
+    }
+
+    suspend fun onSaveClick(): String = withContext(Dispatchers.IO) {
+        var foodId = ""
         formatInput()
         if (validInput().not()) {
-            return false
+            return@withContext foodId
         }
-        viewModelScope.launch {
-            firestoreUseCase.addFoodDocument(
+        val job = async {
+            foodId = firestoreUseCase.addFoodDocument(
                 food = hashMapOf(
                     "food_name" to _uiState.value.foodName.trim(),
                     "brand_name" to _uiState.value.brandName.trim(),
-                    "serving_type_count" to (_uiState.value.servingType.toFloatOrNull() ?: 1f),
-                    "serving_type_units" to _uiState.value.servingTypeUnits,
-                    "serving_amount_count" to (_uiState.value.servingAmount.toFloatOrNull() ?: 0f),
-                    "serving_amount_units" to _uiState.value.servingAmountUnits,
-                    "calories" to (_uiState.value.servingAmount.toFloatOrNull() ?: 0f),
+                    "serving_weight" to (
+                            ServingAmount(
+                                amount = _uiState.value.servingWeight.amount.toFloatOrNull() ?: 0f,
+                                units = _uiState.value.servingWeight.units
+                            )
+                            ),
+                    "serving_volume" to (
+                            ServingAmount(
+                                amount = _uiState.value.servingVolume.amount.toFloatOrNull() ?: 0f,
+                                units = _uiState.value.servingVolume.units
+                            )
+                            ),
+                    "serving_amounts" to (formatServingAmounts()),
+                    "calories" to (_uiState.value.calories.toFloatOrNull() ?: 0f),
                     "total_fat" to (_uiState.value.totalFat.toFloatOrNull() ?: 0f),
                     "saturated_fat" to (_uiState.value.saturatedFat.toFloatOrNull() ?: 0f),
                     "trans_fat" to (_uiState.value.transFat.toFloatOrNull() ?: 0f),
@@ -280,8 +456,10 @@ class CreateFoodViewModel(
                     "protein" to (_uiState.value.protein.toFloatOrNull() ?: 0f),
                 )
             )
-
         }
-        return true
+        job.await()
+        return@withContext foodId
+
+
     }
 }

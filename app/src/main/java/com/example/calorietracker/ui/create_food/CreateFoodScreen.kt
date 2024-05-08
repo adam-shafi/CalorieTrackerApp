@@ -1,27 +1,35 @@
 package com.example.calorietracker.ui.create_food
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,12 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
 import com.example.calorietracker.ui.components.NutritionFactsTextField
 import com.example.calorietracker.ui.components.ServingSizeInput
 import com.example.calorietracker.ui.theme.dimen_8dp
+import com.example.calorietracker.values.ServingSizes
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,9 +52,11 @@ import kotlinx.coroutines.launch
 fun CreateFoodScreen(
     viewModel: CreateFoodViewModel,
     onBackClick: () -> Unit,
+    onSaveClick: (String) -> Unit,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
     val uiState = viewModel.uiState.collectAsState().value
     Scaffold(
         topBar = {
@@ -67,19 +79,17 @@ fun CreateFoodScreen(
                 actions = {
                     IconButton(
                         onClick = {
-                            if (viewModel.onSaveClick()) {
-                                onBackClick()
-                            }
-                            else {
-                                coroutineScope.launch {
-                                    if(uiState.foodNameError != null) {
+                            coroutineScope.launch {
+                                val foodId = viewModel.onSaveClick()
+                                if (foodId.isNotEmpty()) {
+                                    onSaveClick(foodId)
+                                } else {
+                                    if (uiState.foodNameError != null) {
                                         listState.scrollToItem(index = 1)
-                                    }
-                                    else if (uiState.caloriesError) {
+                                    } else if (uiState.caloriesError) {
                                         listState.scrollToItem(index = 7)
                                     }
                                 }
-
                             }
 
                         }
@@ -94,6 +104,9 @@ fun CreateFoodScreen(
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { paddingValues ->
         LazyColumn(
@@ -149,39 +162,85 @@ fun CreateFoodScreen(
                 Spacer(modifier = Modifier.height(10.dp))
             }
             item {
-                Text("Serving Size")
+                Text("Serving Amount")
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            itemsIndexed(uiState.servingAmounts) { index, servingAmount ->
+                ServingSizeInput(
+                    amount = servingAmount.amount,
+                    onAmountChange = { viewModel.updateServingAmounts(index, amount = it) },
+                    amountPlaceholder = "1",
+                    dropdownText = servingAmount.dropdownText,
+                    onDropdownTextChange = { viewModel.updateServingAmounts(index, unitsString = it) },
+                    updateDropdownItems = { viewModel.getServingAmountDropdownItems(index) },
+                    formatInput = viewModel::formatInput,
+                    onDelete = if (uiState.servingAmounts.size > 1) {
+                        { viewModel.deleteServingAmount(index) }
+                    } else {
+                        {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    message = "Must have at least one serving amount"
+                                )
+                            }
+                        }
+                    }
+                )
+            }
+            item {
+                if(uiState.servingAmounts.size < ServingSizes.servingAmountPlural.size) {
+                    OutlinedButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { viewModel.addServingAmount() }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Add,
+                                contentDescription = null
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                textAlign = TextAlign.Center,
+                                text = "Add Serving Amount"
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+            }
+            item {
+                Text("Serving Weight")
                 Spacer(modifier = Modifier.height(10.dp))
             }
             item {
                 ServingSizeInput(
-                    amount = uiState.servingType,
-                    onAmountChange = viewModel::updateServingType,
-                    amountPlaceholder = "1",
-                    dropdownText = uiState.servingTypeUnits,
-                    onDropdownTextChange = viewModel::updateServingTypeUnits,
-                    dropdownItems = listOf(
-                        "serving",
-                        "can"
-                    ),
+                    amount = uiState.servingWeight.amount,
+                    onAmountChange = { viewModel.updateServingWeight(amount = it) },
+                    amountPlaceholder = "0",
+                    dropdownText = uiState.servingWeight.dropdownText,
+                    onDropdownTextChange = { viewModel.updateServingWeight(unitsString = it) },
+                    updateDropdownItems = { viewModel.getServingWeightDropdownItems() },
                     formatInput = viewModel::formatInput
                 )
             }
             item {
+                Text("Serving Volume")
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            item {
                 ServingSizeInput(
-                    amount = uiState.servingAmount,
-                    onAmountChange = viewModel::updateServingAmount,
-                    amountPlaceholder = "(optional)",
-                    dropdownText = uiState.servingAmountUnits,
-                    onDropdownTextChange = viewModel::updateServingAmountUnits,
-                    dropdownItems = listOf(
-                        "grams",
-                        "ounces",
-                        "cups",
-                        "milliliters",
-                    ),
+                    amount = uiState.servingVolume.amount,
+                    onAmountChange = { viewModel.updateServingVolume(amount = it) },
+                    amountPlaceholder = "0",
+                    dropdownText = uiState.servingVolume.dropdownText,
+                    onDropdownTextChange = { viewModel.updateServingVolume(unitsString = it) },
+                    updateDropdownItems = { viewModel.getServingVolumeDropdownItems() },
                     formatInput = viewModel::formatInput
                 )
             }
+
             item {
                 Text("Nutrition Facts")
             }

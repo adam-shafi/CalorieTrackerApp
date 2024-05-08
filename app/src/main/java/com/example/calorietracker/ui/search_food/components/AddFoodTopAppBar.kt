@@ -1,4 +1,4 @@
-package com.example.calorietracker.ui.add_food.components
+package com.example.calorietracker.ui.search_food.components
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width

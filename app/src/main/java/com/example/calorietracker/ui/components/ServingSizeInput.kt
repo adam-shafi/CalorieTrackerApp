@@ -11,9 +11,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -40,12 +42,14 @@ fun ServingSizeInput(
     amountPlaceholder: String? = null,
     dropdownText: String,
     onDropdownTextChange: (String) -> Unit,
-    dropdownItems: List<String>,
-    formatInput: () -> Unit
+    updateDropdownItems: () -> List<String>,
+    formatInput: () -> Unit,
+    onDelete: (() -> Unit)? = null,
 ) {
     var isDropdownExpanded by rememberSaveable { mutableStateOf(false) }
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
+    var dropdownItems: List<String> by remember { mutableStateOf(listOf())}
 
     LaunchedEffect(key1 = isFocused) {
         if(isFocused.not()) {
@@ -76,7 +80,10 @@ fun ServingSizeInput(
             modifier = Modifier
                 .weight(1f)
                 .height(55.dp),
-            onClick = { isDropdownExpanded = true },
+            onClick = {
+                dropdownItems = updateDropdownItems()
+                isDropdownExpanded = true
+                      },
             shape = RoundedCornerShape(10)
         ) {
             Row(
@@ -94,16 +101,22 @@ fun ServingSizeInput(
             DropdownMenu(
                 expanded = isDropdownExpanded,
                 onDismissRequest = { isDropdownExpanded = false }) {
-                dropdownItems.forEach {
-                    DropdownMenuItem(text = { Text(text = it) },
+                dropdownItems.forEach { text ->
+                    DropdownMenuItem(text = { Text(text = text) },
                         onClick = {
-                            onDropdownTextChange(it)
+                            onDropdownTextChange(text)
                             isDropdownExpanded = false
                         }
                     )
                 }
             }
         }
+        onDelete?.let {
+            IconButton(onClick = onDelete) {
+                Icon(imageVector = Icons.Filled.Delete, contentDescription = null)
+            }
+        }
+
     }
     Spacer(modifier = Modifier.height(10.dp))
 }

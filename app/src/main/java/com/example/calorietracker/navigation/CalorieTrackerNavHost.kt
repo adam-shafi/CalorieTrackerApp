@@ -14,7 +14,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.calorietracker.firestore.FirestoreUseCase
 import com.example.calorietracker.ui.add_food.AddFoodScreen
+import com.example.calorietracker.ui.add_food.AddFoodViewModel
+import com.example.calorietracker.ui.search_food.SearchFoodScreen
+import com.example.calorietracker.ui.search_food.SearchFoodViewModel
 import com.example.calorietracker.ui.auth.AuthUiClient
 import com.example.calorietracker.ui.create_food.CreateFoodScreen
 import com.example.calorietracker.ui.create_food.CreateFoodViewModel
@@ -43,8 +47,8 @@ sealed class Screen(
     data object Profile : Screen("profile")
     data object DailyLog : Screen("daily_log")
 
-    data object AddFood : Screen(
-        route = "add_food/{mealName}-{dateId}",
+    data object SearchFood : Screen(
+        route = "search_food/{mealName}-{dateId}",
         navArguments = listOf(
             navArgument("mealName") {
                 type = NavType.StringType
@@ -54,7 +58,7 @@ sealed class Screen(
             },
         )
     ) {
-        fun createRoute(mealName: String, dateId: String) = "add_food/${mealName}-${dateId}"
+        fun createRoute(mealName: String, dateId: String) = "search_food/${mealName}-${dateId}"
     }
 
     data object CreateFood : Screen(
@@ -69,6 +73,17 @@ sealed class Screen(
         )
     ) {
         fun createRoute(mealName: String, dateId: String) = "create_food/${mealName}-${dateId}"
+    }
+
+    data object AddFood: Screen(
+        route = "add_food/{foodId}",
+        navArguments = listOf(
+            navArgument("foodId") {
+                type = NavType.StringType
+            }
+        )
+    ) {
+        fun createRoute(foodId: String) = "add_food/${foodId}"
     }
 }
 
@@ -191,7 +206,7 @@ fun CalorieTrackerNavHost(
             DailyLogScreen(
                 onAddClick = { mealName, dateId ->
                     navController.navigate(
-                        Screen.AddFood.createRoute(mealName = mealName, dateId = dateId)
+                        Screen.SearchFood.createRoute(mealName = mealName, dateId = dateId)
                     )
                 },
                 onProfileClick = {
@@ -200,14 +215,22 @@ fun CalorieTrackerNavHost(
             )
         }
         composable(
-            route = Screen.AddFood.route,
-            arguments = Screen.AddFood.navArguments
+            route = Screen.SearchFood.route,
+            arguments = Screen.SearchFood.navArguments
         ) {
-            AddFoodScreen(
+            val viewModel = viewModel<SearchFoodViewModel>(
+                factory = viewModelFactory {
+                    initializer {
+                        SearchFoodViewModel()
+                    }
+                }
+            )
+            SearchFoodScreen(
+                viewModel = viewModel,
                 onBackClick = { navController.navigateUp() },
-                onCreateFoodClick = { mealName, dateId ->
+                onCreateFoodClick = {
                     navController.navigate(
-                        Screen.CreateFood.createRoute(mealName = mealName, dateId = dateId)
+                        Screen.CreateFood.route
                     )
                 }
             )
@@ -217,15 +240,23 @@ fun CalorieTrackerNavHost(
             route = Screen.CreateFood.route,
             arguments = Screen.CreateFood.navArguments
         ) {
-            val viewModel = viewModel<CreateFoodViewModel>(
-                factory = viewModelFactory {
-                    initializer {
-                        CreateFoodViewModel()
-                    }
+            val viewModel = viewModel<CreateFoodViewModel>()
+            CreateFoodScreen(
+                viewModel = viewModel,
+                onBackClick = { navController.navigateUp() },
+                onSaveClick = { foodId ->
+                    navController.navigate(
+                        Screen.AddFood.createRoute(foodId)
+                    )
                 }
             )
-//            val viewModel = viewModel<CreateFoodViewModel>()
-            CreateFoodScreen(
+        }
+
+        composable(
+            route = Screen.AddFood.route,
+        ) {
+            val viewModel = viewModel<AddFoodViewModel>()
+            AddFoodScreen(
                 viewModel = viewModel,
                 onBackClick = { navController.navigateUp() }
             )
