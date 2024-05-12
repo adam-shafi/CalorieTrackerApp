@@ -1,0 +1,22 @@
+{
+  "name": "calorie-tracker-backend",
+  "version": "1.0.0",
+  "description": "This is the backend for the Calorie Tracker App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adam-shafi/CalorieTrackerApp.git"
+  },
+  "keywords": [
+    "Backend"
+  ],
+  "author": "Adam Shafi",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adam-shafi/CalorieTrackerApp/issues"
+  },
+  "homepage": "https://github.com/adam-shafi/CalorieTrackerApp#readme"
+}
