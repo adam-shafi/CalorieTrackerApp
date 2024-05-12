@@ -4,6 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.calorietracker.data.ServingAmount
 import com.example.calorietracker.firestore.FirestoreUseCase
+import com.example.calorietracker.util.Utility
+import com.example.calorietracker.util.Utility.Companion.validateNumber
 import com.example.calorietracker.values.ServingSizes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -345,29 +347,7 @@ class CreateFoodViewModel(
         return formatted
     }
 
-    private fun validateNumber(update: String): String {
-        return when {
-            update.isEmpty() -> {
-                update
-            }
 
-            update.last().isDigit() -> {
-                update
-            }
-
-            update.last() == '.' -> {
-                if (update.dropLast(1).contains('.')) {
-                    update.dropLast(1)
-                } else {
-                    update
-                }
-            }
-
-            else -> {
-                update.dropLast(1)
-            }
-        }
-    }
 
     private fun updateFoodNameError(newError: String?) {
         _uiState.update {

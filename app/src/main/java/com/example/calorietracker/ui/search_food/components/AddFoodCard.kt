@@ -26,6 +26,7 @@ fun AddFoodCard(
     servingAmount: String,
     servingAmountUnits: String,
     calories: String,
+    onAddClick: () -> Unit,
     imageVector: ImageVector
 ) {
     Row(
@@ -47,7 +48,7 @@ fun AddFoodCard(
                 Text(text = "$calories cal per $servingAmount $servingAmountUnits")
             }
         }
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onAddClick) {
             Icon(imageVector = Icons.Filled.AddCircle, contentDescription = null)
         }
     }

@@ -17,6 +17,30 @@ class Utility {
                 else -> false
             }
         }
+
+        fun validateNumber(update: String): String {
+            return when {
+                update.isEmpty() -> {
+                    update
+                }
+
+                update.last().isDigit() -> {
+                    update
+                }
+
+                update.last() == '.' -> {
+                    if (update.dropLast(1).contains('.')) {
+                        update.dropLast(1)
+                    } else {
+                        update
+                    }
+                }
+
+                else -> {
+                    update.dropLast(1)
+                }
+            }
+        }
     }
 
 }

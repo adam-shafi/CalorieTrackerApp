@@ -38,6 +38,7 @@ fun SearchFoodScreen(
     viewModel: SearchFoodViewModel,
     onBackClick: () -> Unit,
     onCreateFoodClick: () -> Unit,
+    onAddFoodClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var searchText by rememberSaveable { mutableStateOf("") }
@@ -103,7 +104,10 @@ fun SearchFoodScreen(
                                     ServingSizes.servingAmountPlural[it.servingAmount.units]
                                 },
                                 calories = it.calories,
-                                imageVector = ImageVector.vectorResource(R.drawable.chinese_food)
+                                imageVector = ImageVector.vectorResource(R.drawable.chinese_food),
+                                onAddClick = {
+                                    onAddFoodClick(it.foodId)
+                                }
                             )
                         }
                     }

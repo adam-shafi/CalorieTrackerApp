@@ -16,6 +16,7 @@ data class SearchFoodCardInfo(
     val brandName: String = "",
     val servingAmount: ServingAmount = ServingAmount(),
     val calories: String = "",
+    val foodId: String = "",
 //    val painter: Painter
 )
 
@@ -44,18 +45,19 @@ class SearchFoodViewModel(
                 val document = it.data
                 val servingAmountList = document?.get("serving_amounts")
                 if (servingAmountList is List<*>) {
-                    val servinAmountHashMap = servingAmountList[0]
-                    if (servinAmountHashMap is HashMap<*, *>) {
+                    val servingAmountHashMap = servingAmountList[0]
+                    if (servingAmountHashMap is HashMap<*, *>) {
                         val servingAmount = ServingAmount(
-                            amount = servinAmountHashMap["amount"].toString().toFloatOrNull() ?: 0f,
-                            units = servinAmountHashMap["units"].toString().toIntOrNull() ?: 0
+                            amount = servingAmountHashMap["amount"].toString().toFloatOrNull() ?: 0f,
+                            units = servingAmountHashMap["units"].toString().toIntOrNull() ?: 0
                         )
                         foodCards.add(
                             SearchFoodCardInfo(
-                                foodName = document?.get("food_name").toString(),
-                                brandName = document?.get("brand_name").toString(),
+                                foodId = it.id,
+                                foodName = document["food_name"].toString(),
+                                brandName = document["brand_name"].toString(),
                                 servingAmount = servingAmount,
-                                calories = document?.get("calories").toString()
+                                calories = document["calories"].toString()
                             )
                         )
                     }

@@ -232,6 +232,11 @@ fun CalorieTrackerNavHost(
                     navController.navigate(
                         Screen.CreateFood.route
                     )
+                },
+                onAddFoodClick = {foodId ->
+                    navController.navigate(
+                        Screen.AddFood.createRoute(foodId)
+                    )
                 }
             )
         }
