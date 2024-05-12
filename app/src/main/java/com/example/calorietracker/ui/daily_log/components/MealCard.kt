@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -20,16 +21,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.calorietracker.R
-import com.example.calorietracker.ui.components.VerticalText
+import com.example.calorietracker.ui.components.Line
+import com.example.calorietracker.ui.components.MultiColoredLinearProgressBar
+import com.example.calorietracker.ui.daily_log.MacroColorsState
 import com.example.calorietracker.ui.daily_log.MealState
-import com.example.calorietracker.ui.theme.CarbRed
-import com.example.calorietracker.ui.theme.FatGreen
-import com.example.calorietracker.ui.theme.ProteinBlue
 import com.example.calorietracker.ui.theme.dimen_10dp
 import com.example.calorietracker.ui.theme.dimen_16dp
 import com.example.calorietracker.ui.theme.dimen_8dp
@@ -38,7 +42,8 @@ import kotlin.math.roundToInt
 @Composable
 fun MealCard(
     mealState: MealState,
-    onAddClick: (String) -> Unit
+    onAddClick: (String) -> Unit,
+    macroColorsState: MacroColorsState
 ) {
     Card(
         modifier = Modifier
@@ -56,17 +61,73 @@ fun MealCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = mealState.name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "${mealState.calories.roundToInt()} cal")
+//                Row(
+//                    horizontalArrangement = Arrangement.spacedBy(dimen_10dp)
+//                ) {
+//                    Text(
+//                        text = "P ${mealState.protein.roundToInt()}g",
+//                        color = WildBlue
+//                    )
+//                    Text(
+//                        text = "F ${mealState.fat.roundToInt()}g",
+//                        color = ZestyGreen
+//                    )
+//                    Text(
+//                        text = "C ${mealState.carbs.roundToInt()}g",
+//                        color = FruityRed
+//                    )
+//                    Text(
+//                        text = "${mealState.calories.roundToInt()} cal",
+//                        color = BrandOrange
+//                    )
+//                }
+
+
             }
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                VerticalText(title = "${mealState.protein.roundToInt()} g", description = stringResource(id = R.string.protein), color = ProteinBlue)
-                VerticalText(title = "${mealState.carbs.roundToInt()} g", description = stringResource(id = R.string.carbs), color = CarbRed)
-                VerticalText(title = "${mealState.fat.roundToInt()} g", description = stringResource(id = R.string.fat), color = FatGreen)
+                MealNutritionInfo(
+                    modifier = Modifier.weight(1f),
+                    title = "${mealState.calories.roundToInt()}",
+                    description = "Calories",
+                    color = macroColorsState.calories,
+                    icon = ImageVector.vectorResource(R.drawable.calorie)
+                )
+                MealNutritionInfo(
+                    modifier = Modifier.weight(1f),
+                    title = "${mealState.protein.roundToInt()}g",
+                    description = stringResource(id = R.string.protein),
+                    color = macroColorsState.protein,
+                    icon = ImageVector.vectorResource(R.drawable.protein)
+                )
+
+                MealNutritionInfo(
+                    modifier = Modifier.weight(1f),
+                    title = "${mealState.fat.roundToInt()}g",
+                    description = stringResource(id = R.string.fat),
+                    color = macroColorsState.fat,
+                    icon = ImageVector.vectorResource(R.drawable.fat)
+                )
+                MealNutritionInfo(
+                    modifier = Modifier.weight(1f),
+                    title = "${mealState.carbs.roundToInt()}g",
+                    description = stringResource(id = R.string.carbs),
+                    color = macroColorsState.carbs,
+                    icon = ImageVector.vectorResource(R.drawable.carbs)
+                )
+
             }
-            mealState.foods.forEach{ food ->
+            MultiColoredLinearProgressBar(
+                modifier = Modifier.padding(dimen_8dp).height(10.dp),
+                lines = listOf(
+                    Line(progress = .4f, color = macroColorsState.protein),
+                    Line(progress = .4f, color = macroColorsState.fat),
+                    Line(progress = 0.2f, color = macroColorsState.carbs),
+                )
+            )
+            mealState.foods.forEach { food ->
                 MealItem(
                     food = food.name,
                     serving = "${food.servingAmount.roundToInt()} ${food.servingUnits}",
@@ -83,7 +144,7 @@ fun MealCard(
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
-                    ){
+                    ) {
                         Icon(imageVector = Icons.Filled.Add, contentDescription = "Add")
                         Text("Add")
                     }
@@ -122,5 +183,35 @@ fun MealItem(
             }
         }
         Text(text = calories)
+    }
+}
+
+@Composable
+fun MealNutritionInfo(
+    modifier: Modifier = Modifier,
+    title: String,
+    titleFont: TextUnit = 18.sp,
+    description: String,
+    color: Color,
+    icon: ImageVector
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(text = title, fontSize = titleFont)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+//            Icon(imageVector = icon, contentDescription = null, tint = color)
+//            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = description,
+                color = color
+            )
+        }
+
     }
 }

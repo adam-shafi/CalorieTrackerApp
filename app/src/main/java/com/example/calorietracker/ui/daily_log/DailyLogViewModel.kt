@@ -22,6 +22,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit
+import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.abs
 
@@ -77,20 +78,25 @@ class DailyLogViewModel @Inject constructor(
                 date = dateString,
                 totalCalories = MacroInfoState(
                     budget = repository.getNutritionBudget()?.caloriesBudget ?: 2000f,
-                    foodEaten = eaten.caloriesBudget
+//                    foodEaten = eaten.caloriesBudget
+                    foodEaten = 1500f
                 ),
                 totalProtein = MacroInfoState(
                     budget = repository.getNutritionBudget()?.proteinBudget ?: 150f,
-                    foodEaten = eaten.proteinBudget
+//                    foodEaten = eaten.proteinBudget
+                    foodEaten = 175f
                 ),
+
                 totalCarbs = MacroInfoState(
                     budget = repository.getNutritionBudget()?.carbsBudget ?: 50f,
-                    foodEaten = eaten.carbsBudget
+//                    foodEaten = eaten.carbsBudget
+                    foodEaten = 20f,
                 ),
 
                 totalFat = MacroInfoState(
                     budget = repository.getNutritionBudget()?.fatBudget ?: 60f,
-                    foodEaten = eaten.fatBudget
+//                    foodEaten = eaten.fatBudget
+                    foodEaten = 20f
                 ),
                 meals = generateMealState(
                     meals = meals,
@@ -136,7 +142,7 @@ class DailyLogViewModel @Inject constructor(
     }
 
     private fun calculatePercent(budget: Float, current: Float): Float {
-        return current.div(budget) * 100
+        return current.div(budget)
     }
 
     private fun isOver(budget: Float, current: Float): Boolean {
@@ -175,7 +181,7 @@ class DailyLogViewModel @Inject constructor(
         if ((current.isEqual(before) || current.isAfter(before)) && current.isBefore(after)) {
             return "Tomorrow"
         }
-        return "${current.month.name}, ${current.dayOfMonth}"
+        return "${current.month.name.lowercase().capitalized()}, ${current.dayOfMonth}"
     }
 
     private fun calculateEaten(foods: List<Food>): NutritionBudget {
@@ -282,6 +288,122 @@ class DailyLogViewModel @Inject constructor(
                         iconId = R.drawable.canned_fish_food,
                         servingAmount = 1f,
                         servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Canned Tuna",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Canned Tuna",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Ramen",
+                        calories = 130f,
+                        iconId = R.drawable.chinese_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Rice",
+                        calories = 130f,
+                        iconId = R.drawable.hot_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    )
+                )
+            )
+            list[1] = MealState(
+                name = "Lunch",
+                calories = 1f,
+                protein = 0f,
+                carbs = 0f,
+                fat = 0f,
+                foods = listOf(
+                    FoodState(
+                        name = "ASDASD Tuna",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "ASDASDa",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Canned Tuna",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Ramen",
+                        calories = 130f,
+                        iconId = R.drawable.chinese_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Rice",
+                        calories = 130f,
+                        iconId = R.drawable.hot_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    )
+                )
+            )
+            list[2] = MealState(
+                name = "Dinner",
+                calories = 69f,
+                protein = 0f,
+                carbs = 0f,
+                fat = 0f,
+                foods = listOf(
+                    FoodState(
+                        name = "NOT",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Canned Tuna",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Canned Tuna",
+                        calories = 130f,
+                        iconId = R.drawable.canned_fish_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Ramen",
+                        calories = 130f,
+                        iconId = R.drawable.chinese_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
+                    ),
+                    FoodState(
+                        name = "Rice",
+                        calories = 130f,
+                        iconId = R.drawable.hot_food,
+                        servingAmount = 1f,
+                        servingUnits = "can"
                     )
                 )
             )
@@ -327,6 +449,12 @@ class DailyLogViewModel @Inject constructor(
 
 }
 
-
+fun String.capitalized(): String {
+    return this.replaceFirstChar {
+        if (it.isLowerCase())
+            it.titlecase(Locale.getDefault())
+        else it.toString()
+    }
+}
 
 

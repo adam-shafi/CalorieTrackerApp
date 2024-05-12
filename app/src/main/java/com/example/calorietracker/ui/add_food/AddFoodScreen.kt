@@ -1,94 +1,112 @@
 package com.example.calorietracker.ui.add_food
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.calorietracker.R
-import com.example.calorietracker.ui.add_food.components.AddFoodTopAppBar
-import com.example.calorietracker.ui.add_food.components.CategoryButtons
-import com.example.calorietracker.ui.add_food.components.Searchbar
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.calorietracker.ui.components.ServingSizeInput
+import com.example.calorietracker.ui.components.TitleAndDropdown
 import com.example.calorietracker.ui.theme.dimen_8dp
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddFoodScreen(
-    viewModel: AddFoodViewModel = hiltViewModel(),
+    viewModel: AddFoodViewModel,
     onBackClick: () -> Unit,
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    var searchText by rememberSaveable { mutableStateOf("") }
-    val pageState = rememberPagerState(initialPage = 0, pageCount = { 4 })
-    val scrollCoroutine = rememberCoroutineScope()
-
-    fun scrollToPage(pageNumber: Int) {
-        scrollCoroutine.launch {
-            pageState.animateScrollToPage(pageNumber)
-        }
-    }
-
+    val uiState = viewModel.uiState.collectAsState().value
     Scaffold(
         topBar = {
-            AddFoodTopAppBar(
-                onBackClick = onBackClick,
-                mealNames = uiState.mealNames,
-                selectedMealName = uiState.selectedMealName,
-                updateSelectedMealName = viewModel::updateSelectedMealName
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(R.drawable.barcode_scanner),
-                    contentDescription = "Barcode Scanner"
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Add Food",
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        fontSize = 20.sp
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Navigate Back"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Filled.Check, contentDescription = null)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
-            }
+            )
         }
     ) { paddingValues ->
-        Surface(
-            modifier = Modifier.padding(paddingValues)
+        LazyColumn(
+            modifier = Modifier
+                .padding(paddingValues)
+                .padding(dimen_8dp)
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.Start,
         ) {
-            Column(
-                modifier = Modifier.padding(dimen_8dp)
-            ) {
-
-                Searchbar(searchText = searchText, updateSearchText = { searchText = it })
-
-                CategoryButtons(
-                    buttons = listOf("All", "My Foods", "Meals", "Recipes"),
-                    scrollToPage = { scrollToPage(it) },
-                    currentPage = pageState.currentPage
+            item {
+                Text(
+                    text = if (uiState.brandName.isNullOrBlank()
+                            .not()
+                    ) "${uiState.foodName} (${uiState.brandName})" else uiState.foodName,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
                 )
-
-                HorizontalPager(
-                    state = pageState,
-                    modifier = Modifier.fillMaxSize(),
-                ) {
-                    Text("HELLO")
-                }
-
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            item {
+                TitleAndDropdown(
+                    title = "Meal",
+                    dropdownText = uiState.selectedMeal,
+                    onDropdownTextChange = { viewModel.updateUiState(selectedMeal = it)},
+                    dropdownItems = listOf("Breakfast", "Lunch", "Dinner")
+                )
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            item {
+                ServingSizeInput(
+                    amount = uiState.selectedServingAmount,
+                    onAmountChange = { viewModel.updateSelectedServingAmount(amount = it)},
+                    dropdownText = uiState.selectedServingAmountUnits,
+                    onDropdownTextChange = { viewModel.updateUiState(selectedServingAmountUnits = it)},
+                    updateDropdownItems = { viewModel.getServingUnitsDropdownItems() },
+                    formatInput = { /*TODO*/ })
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
+
     }
 }
-
-
