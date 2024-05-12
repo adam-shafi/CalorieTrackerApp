@@ -18,5 +18,9 @@
   "bugs": {
     "url": "https://github.com/adam-shafi/CalorieTrackerApp/issues"
   },
-  "homepage": "https://github.com/adam-shafi/CalorieTrackerApp#readme"
+  "homepage": "https://github.com/adam-shafi/CalorieTrackerApp#readme",
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  }
 }
